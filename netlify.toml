@@ -3,4 +3,6 @@
 
 [functions]
   node_bundler = "esbuild"
+
+[functions."proxy"]
   timeout = 260
