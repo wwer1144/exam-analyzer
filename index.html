@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>시험분석기 — 프로토타입</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Pretendard:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1B2A4A;
+    --paper:#FAF6EF;
+    --coral:#E8714A;
+    --ink:#201D1A;
+    --muted:#8B8779;
+    --line:#E3DDCF;
+    --green:#4A7C59;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Pretendard', sans-serif;
+    line-height:1.5;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;}
+
+  header.top{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:3px solid var(--navy);
+    padding-bottom:18px;margin-bottom:36px;
+  }
+  .brand{display:flex;flex-direction:column;gap:4px;}
+  .brand .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;
+    color:var(--coral);font-weight:700;text-transform:uppercase;
+  }
+  .brand h1{
+    font-family:'Noto Serif KR',serif;font-weight:900;font-size:30px;margin:0;color:var(--navy);
+  }
+  .top-right{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);text-align:right;}
+
+  .layout{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start;}
+  @media (max-width:880px){.layout{grid-template-columns:1fr;}}
+
+  .panel{
+    background:var(--card);border:1px solid var(--line);border-radius:4px;
+    padding:24px;
+  }
+  .panel h2{
+    font-family:'Noto Serif KR',serif;font-size:17px;margin:0 0 16px;color:var(--navy);
+    display:flex;align-items:center;gap:8px;
+  }
+  .panel h2 .num{
+    font-family:'JetBrains Mono',monospace;color:var(--coral);font-size:13px;
+  }
+
+  .dropzone{
+    border:2px dashed var(--line);border-radius:4px;padding:28px 16px;text-align:center;
+    cursor:pointer;transition:border-color .15s,background .15s;
+  }
+  .dropzone:hover, .dropzone.drag{border-color:var(--coral);background:#FFF7F2;}
+  .dropzone p{margin:8px 0 0;font-size:13px;color:var(--muted);}
+  .dropzone .icon{font-size:28px;}
+  input[type=file]{display:none;}
+  .filename{
+    margin-top:14px;font-family:'JetBrains Mono',monospace;font-size:12px;
+    background:#F2EEE3;padding:8px 10px;border-radius:3px;color:var(--ink);
+    word-break:break-all;
+  }
+
+  .toggle-row{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-top:20px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:13px;
+  }
+  .toggle-row .label-main{font-weight:600;}
+  .toggle-row .label-sub{display:block;color:var(--muted);font-size:11.5px;margin-top:2px;}
+  .switch{position:relative;width:42px;height:24px;flex:none;margin-left:12px;}
+  .switch input{display:none;}
+  .slider{
+    position:absolute;inset:0;background:#D8D2C2;border-radius:24px;cursor:pointer;transition:.15s;
+  }
+  .slider:before{
+    content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;
+    background:white;border-radius:50%;transition:.15s;
+  }
+  .switch input:checked + .slider{background:var(--green);}
+  .switch input:checked + .slider:before{transform:translateX(18px);}
+
+  button.primary{
+    width:100%;margin-top:22px;background:var(--navy);color:#fff;border:none;
+    padding:14px;font-size:14px;font-weight:700;border-radius:3px;cursor:pointer;
+    font-family:'Pretendard',sans-serif;letter-spacing:.01em;transition:background .15s;
+  }
+  button.primary:hover{background:#26396B;}
+  button.primary:disabled{background:#C8C2B3;cursor:not-allowed;}
+
+  .note{font-size:11.5px;color:var(--muted);margin-top:12px;line-height:1.6;}
+
+  /* results */
+  .results-empty{
+    border:1px dashed var(--line);border-radius:4px;padding:80px 20px;text-align:center;color:var(--muted);
+  }
+  .results-empty .stamp{
+    font-family:'Noto Serif KR',serif;font-size:15px;color:var(--line);border:2px solid var(--line);
+    display:inline-block;padding:10px 18px;border-radius:50%;transform:rotate(-8deg);margin-bottom:18px;
+  }
+
+  .stage{
+    display:none;text-align:center;padding:70px 20px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:13px;
+  }
+  .stage.show{display:block;}
+  .spinner{
+    width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--coral);
+    border-radius:50%;margin:0 auto 18px;animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .report{display:none;}
+  .report.show{display:block;}
+
+  .stamp-header{
+    display:flex;justify-content:space-between;align-items:center;
+    background:var(--navy);color:#fff;border-radius:4px;padding:22px 26px;margin-bottom:22px;
+  }
+  .stamp-header .meta-title{font-family:'Noto Serif KR',serif;font-weight:700;font-size:19px;}
+  .stamp-header .meta-sub{font-family:'JetBrains Mono',monospace;font-size:12px;color:#B9C3DA;margin-top:6px;}
+  .seal{
+    font-family:'Noto Serif KR',serif;font-weight:900;font-size:13px;color:var(--coral);
+    border:2px solid var(--coral);border-radius:50%;width:64px;height:64px;
+    display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2;
+    transform:rotate(8deg);flex:none;
+  }
+
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+  @media (max-width:700px){.stat-row{grid-template-columns:repeat(2,1fr);}}
+  .stat-card{
+    background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px;
+  }
+  .stat-card .num{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:var(--navy);}
+  .stat-card .lbl{font-size:11.5px;color:var(--muted);margin-top:4px;}
+
+  .section{
+    background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px 24px;margin-bottom:18px;
+  }
+  .section h3{
+    font-family:'Noto Serif KR',serif;font-size:15px;margin:0 0 16px;color:var(--navy);
+    display:flex;align-items:center;gap:8px;
+  }
+  .section h3 .tag{
+    font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--coral);color:#fff;
+    padding:2px 7px;border-radius:2px;font-weight:700;letter-spacing:.04em;
+  }
+
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
+  .bar-row .name{width:120px;flex:none;font-weight:600;}
+  .bar-track{flex:1;background:#F0ECE0;border-radius:2px;height:18px;overflow:hidden;position:relative;}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--navy),#3C5586);border-radius:2px;}
+  .bar-row .val{width:90px;flex:none;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);}
+
+  table.items{width:100%;border-collapse:collapse;font-size:13px;}
+  table.items th{
+    text-align:left;font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;
+    letter-spacing:.03em;border-bottom:1px solid var(--line);padding:8px 10px;
+  }
+  table.items td{padding:10px;border-bottom:1px solid #F0ECE0;vertical-align:top;}
+  table.items tr:hover td{background:#FBF8F1;}
+  .num-cell{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--navy);width:36px;}
+  .pill{
+    display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;
+    background:#EDE7D6;color:var(--ink);
+  }
+  .pill.hard{background:#FBE3D8;color:#B8451E;}
+  .pill.mid{background:#E8E2F2;color:#5B4A8A;}
+  .pill.easy{background:#E2EFE5;color:var(--green);}
+  .src-text{color:var(--muted);font-size:12px;font-style:italic;}
+
+  .actions{display:flex;gap:10px;margin-top:24px;}
+  .actions button{
+    flex:1;padding:12px;font-size:13px;font-weight:700;border-radius:3px;cursor:pointer;
+    font-family:'Pretendard',sans-serif;border:1px solid var(--navy);
+  }
+  .btn-outline{background:#fff;color:var(--navy);}
+  .btn-outline:hover{background:#F0ECE0;}
+  .btn-solid{background:var(--navy);color:#fff;}
+  .btn-solid:hover{background:#26396B;}
+
+  .error-box{
+    background:#FDECE6;border:1px solid #E8714A;color:#8A3517;border-radius:4px;
+    padding:14px 16px;font-size:13px;margin-bottom:18px;
+  }
+
+  @media print{
+    .panel.upload-panel, header.top, .actions{display:none !important;}
+    body{background:#fff;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <span class="eyebrow">Exam Analyzer — Prototype</span>
+      <h1>시험분석기</h1>
+    </div>
+    <div class="top-right">선생님용 시험 분석 도구<br>MVP v0.1</div>
+  </header>
+
+  <div class="layout">
+
+    <div class="panel upload-panel">
+      <h2><span class="num">01</span> 시험지 업로드</h2>
+
+      <div class="dropzone" id="dropzone">
+        <div class="icon">📄</div>
+        <p><strong>PDF 파일을 클릭하거나 끌어다 놓으세요</strong><br>스캔된 시험 문제지 (선택형/서답형 무관)</p>
+      </div>
+      <input type="file" id="fileInput" accept="application/pdf">
+      <div class="filename" id="filename" style="display:none;"></div>
+
+      <div class="toggle-row">
+        <div>
+          <span class="label-main">문항별 요약 설명 포함</span>
+          <span class="label-sub">원문 그대로가 아닌, 출제 의도를 풀어쓴 한 줄 설명</span>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggleDetail" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button class="primary" id="analyzeBtn" disabled>분석 시작</button>
+
+      <p class="note">
+        ⓘ 본 도구는 시험 문제 원문을 그대로 복제·전재하지 않고, 단원·유형·난이도 중심의 통계 분석 리포트를 생성합니다.
+        생성된 리포트를 외부에 게시할 경우 학교 측 저작권 정책을 별도로 확인하시기 바랍니다.
+      </p>
+    </div>
+
+    <div class="results-col">
+
+      <div class="results-empty" id="emptyState">
+        <div class="stamp">분석 대기중</div>
+        <p>왼쪽에서 시험지 PDF를 업로드하면<br>여기에 분석 리포트가 표시됩니다.</p>
+      </div>
+
+      <div class="stage" id="stageBox">
+        <div class="spinner"></div>
+        <div id="stageText">페이지를 이미지로 변환하는 중…</div>
+      </div>
+
+      <div id="errorBox"></div>
+
+      <div class="report" id="report"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const filenameEl = document.getElementById('filename');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const emptyState = document.getElementById('emptyState');
+const stageBox = document.getElementById('stageBox');
+const stageText = document.getElementById('stageText');
+const reportEl = document.getElementById('report');
+const errorBox = document.getElementById('errorBox');
+const toggleDetail = document.getElementById('toggleDetail');
+
+let selectedFile = null;
+let lastAnalysis = null;
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.classList.remove('drag');
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => {
+  if (e.target.files.length) handleFile(e.target.files[0]);
+});
+
+function handleFile(file) {
+  if (file.type !== 'application/pdf') {
+    showError('PDF 파일만 업로드할 수 있습니다.');
+    return;
+  }
+  selectedFile = file;
+  filenameEl.style.display = 'block';
+  filenameEl.textContent = file.name + ' (' + (file.size/1024/1024).toFixed(2) + ' MB)';
+  analyzeBtn.disabled = false;
+  errorBox.innerHTML = '';
+}
+
+function showError(msg) {
+  errorBox.innerHTML = '<div class="error-box">⚠ ' + msg + '</div>';
+}
+
+async function pdfToImages(file) {
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({data: buf}).promise;
+  const images = [];
+  const maxPages = Math.min(pdf.numPages, 10);
+  for (let i = 1; i <= maxPages; i++) {
+    stageText.textContent = `페이지 변환 중… (${i}/${maxPages})`;
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({scale: 1.1});
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+    await page.render({canvasContext: ctx, viewport}).promise;
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+    images.push(dataUrl.split(',')[1]);
+  }
+  return images;
+}
+
+async function analyzeWithClaude(images, includeDetail, attempt) {
+  attempt = attempt || 1;
+  const content = images.map(img => ({
+    type: 'image',
+    source: { type: 'base64', media_type: 'image/jpeg', data: img }
+  }));
+
+  const prompt = `너는 한국 중고등학교 시험지를 분석하는 교육 데이터 분석가야. 첨부된 시험지 이미지를 보고 분석해줘.
+
+중요한 규칙:
+- 문제의 원문(지문, 보기, 선택지, 그림 설명 등)을 그대로 옮겨 적지 마. 저작권 보호 대상이야.
+- 대신 각 문항이 어떤 단원/개념을 다루는지, 어떤 유형(계산/응용/복합/도형/서술형 등)인지, 난이도가 어느 정도인지를 너의 표현으로 요약해.
+- 손글씨로 채점/풀이 흔적이 있다면 무시하고 인쇄된 문제만 분석해.
+
+단원 분류 규칙 (중요):
+- 단원은 세부 소단원이 아니라 교과서 "대단원" 수준으로 묶어줘. 너무 잘게 쪼개지 마.
+- 예를 들어 공통수학1이라면 "행렬", "여러 가지 방정식", "여러 가지 부등식", "경우의 수", "이차방정식과 이차함수" 정도의 큰 범주로 묶고, "이차부등식", "연립부등식", "절댓값 부등식"처럼 세분화하지 마 — 이런 건 모두 "여러 가지 부등식"으로 묶어.
+- 과목이 다르면 그 과목의 실제 교과서 대단원 체계를 기준으로 동일하게 적용해.
+
+난이도 분류 규칙 (중요):
+- 절대 너의 주관적 풀이 난이도 인상만으로 판단하지 마. 다음 기준을 우선 적용해:
+  1) 배점이 가장 강력한 단서야. 일반적으로 한국 고등 수학 시험은 문항이 뒤로 갈수록, 배점이 높을수록 어려워. 전체 문항을 배점 기준으로 정렬했을 때 상위 약 20%만 "hard"로 분류해.
+  2) 배점이 중간 구간(전체의 중간 40~50%)인 문항은 "mid"로 분류해.
+  3) 배점이 낮은 하위 약 30~40% 문항(보통 시험 앞부분)은 "easy"로 분류해.
+  4) "hard"를 과도하게 남발하지 마 — 전체 문항 중 hard 비율이 25%를 넘지 않도록 보수적으로 판단해. 단순히 계산 과정이 길어 보인다고 hard로 분류하지 마.
+
+다음 JSON 형식으로만 응답해. 다른 텍스트는 절대 포함하지 마:
+
+{
+  "exam_info": {
+    "school": "학교명",
+    "grade": "학년",
+    "subject": "과목명",
+    "exam_name": "고사명(예: 1학기 기말고사)",
+    "date": "시행일",
+    "total_questions": 숫자,
+    "total_points": 숫자
+  },
+  "unit_distribution": [
+    {"unit": "단원명", "count": 문항수, "points": 배점합}
+  ],
+  "type_distribution": [
+    {"type": "유형명(예: 단순계산/개념응용/복합고난도/도형/문장제)", "count": 문항수}
+  ],
+  "difficulty_summary": {
+    "easy_count": 숫자,
+    "mid_count": 숫자,
+    "hard_count": 숫자
+  },
+  "items": [
+    {
+      "number": 문항번호,
+      "unit": "단원명",
+      "type": "유형",
+      "points": 배점,
+      "difficulty": "easy|mid|hard",
+      "summary": "${includeDetail ? '한 줄 요약 설명 (원문 인용 없이 너의 표현으로, 20자 내외)' : ''}"
+    }
+  ],
+  "insights": [
+    "이번 시험의 출제 경향에 대한 한두 문장짜리 인사이트 (저작권 문제 없는 일반적 분석)"
+  ]
+}`;
+
+  let response;
+  try {
+    response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8000,
+        messages: [
+          { role: 'user', content: [...content, { type: 'text', text: prompt }] }
+        ]
+      })
+    });
+  } catch (networkErr) {
+    if (attempt < 3) {
+      await new Promise(r => setTimeout(r, 1200));
+      return analyzeWithClaude(images, includeDetail, attempt + 1);
+    }
+    throw new Error('네트워크 요청이 끊겼습니다 (이미지 용량이 너무 크거나 일시적 연결 문제일 수 있어요). 페이지 수가 적은 시험지로 먼저 테스트해보거나, 잠시 후 다시 시도해 주세요. (' + networkErr.message + ')');
+  }
+
+  if (!response.ok) {
+    let detail = '';
+    try { const errJson = await response.json(); detail = errJson?.error?.message || JSON.stringify(errJson); } catch(e) { detail = await response.text(); }
+    throw new Error('API 호출 실패 (' + response.status + '): ' + detail);
+  }
+  const data = await response.json();
+
+  if (data.stop_reason === 'max_tokens') {
+    throw new Error('응답이 길이 제한으로 잘렸습니다. 문항 수가 많은 시험지입니다 — 페이지를 나눠서 다시 시도해 주세요.');
+  }
+
+  const text = data.content.map(b => b.text || '').join('\n');
+  const firstBrace = text.indexOf('{');
+  const lastBrace = text.lastIndexOf('}');
+  if (firstBrace === -1 || lastBrace === -1) {
+    throw new Error('응답에서 JSON 형식을 찾을 수 없습니다. 원본 응답: ' + text.slice(0, 300));
+  }
+  const clean = text.slice(firstBrace, lastBrace + 1);
+  try {
+    return JSON.parse(clean);
+  } catch (e) {
+    throw new Error('JSON 파싱 실패: ' + e.message + ' / 원본 일부: ' + clean.slice(0,300));
+  }
+}
+
+function difficultyLabel(d) {
+  if (d === 'hard') return '<span class="pill hard">고난도</span>';
+  if (d === 'mid') return '<span class="pill mid">중간</span>';
+  return '<span class="pill easy">기본</span>';
+}
+
+function renderReport(a) {
+  const info = a.exam_info || {};
+  const maxUnitCount = Math.max(...(a.unit_distribution||[{count:1}]).map(u=>u.count), 1);
+
+  let html = '';
+
+  html += `<div class="stamp-header">
+    <div>
+      <div class="meta-title">${info.school || '학교명 미상'} · ${info.grade || ''} ${info.subject || ''}</div>
+      <div class="meta-sub">${info.exam_name || ''} ${info.date ? '· ' + info.date : ''} · 총 ${info.total_questions || '-'}문항 · ${info.total_points || '-'}점</div>
+    </div>
+    <div class="seal">분석<br>완료</div>
+  </div>`;
+
+  const diff = a.difficulty_summary || {};
+  html += `<div class="stat-row">
+    <div class="stat-card"><div class="num">${info.total_questions ?? '-'}</div><div class="lbl">전체 문항 수</div></div>
+    <div class="stat-card"><div class="num">${diff.hard_count ?? '-'}</div><div class="lbl">고난도 문항</div></div>
+    <div class="stat-card"><div class="num">${(a.unit_distribution||[]).length}</div><div class="lbl">출제 단원 수</div></div>
+    <div class="stat-card"><div class="num">${info.total_points ?? '-'}</div><div class="lbl">총 배점</div></div>
+  </div>`;
+
+  html += `<div class="section"><h3><span class="tag">CHART</span> 단원별 출제 비중</h3>`;
+  (a.unit_distribution||[]).forEach(u => {
+    const pct = Math.round((u.count / maxUnitCount) * 100);
+    html += `<div class="bar-row">
+      <div class="name">${u.unit}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="val">${u.count}문항 · ${u.points ?? '-'}점</div>
+    </div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="section"><h3><span class="tag">TYPE</span> 유형 분포</h3>`;
+  (a.type_distribution||[]).forEach(t => {
+    html += `<span class="pill" style="margin:0 6px 6px 0;">${t.type} · ${t.count}문항</span>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="section"><h3><span class="tag">LIST</span> 문항별 분석</h3>
+    <table class="items"><thead><tr>
+      <th>번호</th><th>단원</th><th>유형</th><th>배점</th><th>난이도</th><th>요약</th>
+    </tr></thead><tbody>`;
+  (a.items||[]).forEach(it => {
+    html += `<tr>
+      <td class="num-cell">${it.number}</td>
+      <td>${it.unit||''}</td>
+      <td>${it.type||''}</td>
+      <td>${it.points ?? ''}</td>
+      <td>${difficultyLabel(it.difficulty)}</td>
+      <td class="src-text">${it.summary||''}</td>
+    </tr>`;
+  });
+  html += `</tbody></table></div>`;
+
+  if (a.insights && a.insights.length) {
+    html += `<div class="section"><h3><span class="tag">INSIGHT</span> 출제 경향 코멘트</h3>
+      <ul style="margin:0;padding-left:18px;font-size:13px;">`;
+    a.insights.forEach(i => html += `<li style="margin-bottom:6px;">${i}</li>`);
+    html += `</ul></div>`;
+  }
+
+  html += `<div class="actions">
+    <a class="btn-outline" id="mdLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">📝 마크다운 다운로드</a>
+    <a class="btn-outline" id="docxLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">📄 워드(.docx) 다운로드</a>
+    <a class="btn-solid" id="pdfLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">📑 PDF 다운로드 준비 중…</a>
+  </div>
+  <p class="note" style="margin-top:14px;">ⓘ .docx 파일은 한글(HWP) 프로그램에서도 그대로 열어 편집할 수 있습니다. 버튼 클릭 후 다운로드가 시작되지 않으면, 버튼을 한 번 더 클릭해 파일 준비를 기다려주세요.</p>`;
+
+  reportEl.innerHTML = html;
+  reportEl.classList.add('show');
+  emptyState.style.display = 'none';
+  wireUpActions(a);
+}
+
+function buildMarkdownString(a) {
+  const info = a.exam_info || {};
+  let md = `# ${info.school||''} ${info.grade||''} ${info.subject||''} 시험 분석\n\n`;
+  md += `**${info.exam_name||''}** | ${info.date||''} | 총 ${info.total_questions||'-'}문항 / ${info.total_points||'-'}점\n\n`;
+  md += `## 단원별 출제 비중\n\n`;
+  (a.unit_distribution||[]).forEach(u => md += `- ${u.unit}: ${u.count}문항 (${u.points ?? '-'}점)\n`);
+  md += `\n## 유형 분포\n\n`;
+  (a.type_distribution||[]).forEach(t => md += `- ${t.type}: ${t.count}문항\n`);
+  md += `\n## 문항별 분석\n\n| 번호 | 단원 | 유형 | 배점 | 난이도 | 요약 |\n|---|---|---|---|---|---|\n`;
+  (a.items||[]).forEach(it => md += `| ${it.number} | ${it.unit||''} | ${it.type||''} | ${it.points??''} | ${it.difficulty||''} | ${it.summary||''} |\n`);
+  if (a.insights && a.insights.length) {
+    md += `\n## 출제 경향 코멘트\n\n`;
+    a.insights.forEach(i => md += `- ${i}\n`);
+  }
+  return md;
+}
+
+function wireUpActions(a) {
+  const info = a.exam_info || {};
+  const safeName = (info.school||'exam').replace(/[^a-zA-Z0-9가-힣]/g,'_');
+
+  // 마크다운: 즉시 생성 가능
+  const mdBlob = new Blob([buildMarkdownString(a)], {type: 'text/markdown'});
+  const mdLink = document.getElementById('mdLink');
+  mdLink.href = URL.createObjectURL(mdBlob);
+  mdLink.download = `exam_analysis_${safeName}.md`;
+
+  // docx: 비동기 생성, 준비되면 href 연결. 그 전에 클릭하면 안내.
+  const docxLink = document.getElementById('docxLink');
+  docxLink.textContent = '📄 워드(.docx) 준비 중…';
+  docxLink.style.opacity = '0.6';
+  docxLink.addEventListener('click', (e) => {
+    if (!docxLink.href || docxLink.href.endsWith('#')) e.preventDefault();
+  });
+  buildDocxBlob(a).then(blob => {
+    docxLink.href = URL.createObjectURL(blob);
+    docxLink.download = `exam_analysis_${safeName}.docx`;
+    docxLink.textContent = '📄 워드(.docx) 다운로드';
+    docxLink.style.opacity = '1';
+  }).catch(err => {
+    docxLink.textContent = '⚠ 워드 생성 실패';
+    console.error(err);
+  });
+
+  // PDF: 리포트 영역을 그대로 PDF 파일로 변환
+  const pdfLink = document.getElementById('pdfLink');
+  pdfLink.addEventListener('click', (e) => {
+    if (!pdfLink.href || pdfLink.href.endsWith('#')) e.preventDefault();
+  });
+  buildPdfBlob(reportEl).then(blob => {
+    pdfLink.href = URL.createObjectURL(blob);
+    pdfLink.download = `exam_analysis_${safeName}.pdf`;
+    pdfLink.textContent = '📑 PDF 다운로드';
+  }).catch(err => {
+    pdfLink.textContent = '⚠ PDF 생성 실패';
+    console.error(err);
+  });
+}
+
+async function buildPdfBlob(reportNode) {
+  const clone = reportNode.cloneNode(true);
+  const actionsDiv = clone.querySelector('.actions');
+  if (actionsDiv) actionsDiv.remove();
+  const noteP = clone.querySelector('p.note');
+  if (noteP && noteP.parentElement === clone) noteP.remove();
+
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'background:#FAF6EF;padding:24px;width:760px;';
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+
+  try {
+    const opt = {
+      margin: 8,
+      filename: 'report.pdf',
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#FAF6EF' },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak: { mode: ['css', 'legacy'] }
+    };
+    const blob = await window.html2pdf().set(opt).from(wrapper).outputPdf('blob');
+    return blob;
+  } finally {
+    document.body.removeChild(wrapper);
+  }
+}
+
+async function buildDocxBlob(a) {
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, WidthType } = docx;
+  const info = a.exam_info || {};
+
+  const titlePara = new Paragraph({
+    heading: HeadingLevel.HEADING_1,
+    children: [new TextRun(`${info.school||''} ${info.grade||''} ${info.subject||''} 시험 분석`)]
+  });
+  const subPara = new Paragraph({
+    children: [new TextRun({
+      text: `${info.exam_name||''}  |  ${info.date||''}  |  총 ${info.total_questions||'-'}문항 / ${info.total_points||'-'}점`,
+      color: '8B8779', size: 20
+    })]
+  });
+
+  const unitHeading = new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('단원별 출제 비중')] });
+  const unitRows = [
+    new TableRow({ children: ['단원','문항수','배점'].map(h => new TableCell({ children:[new Paragraph({children:[new TextRun({text:h,bold:true})]})] })) }),
+    ...(a.unit_distribution||[]).map(u => new TableRow({ children: [
+      new TableCell({children:[new Paragraph(String(u.unit||''))]}),
+      new TableCell({children:[new Paragraph(String(u.count??''))]}),
+      new TableCell({children:[new Paragraph(String(u.points??''))]})
+    ]}))
+  ];
+  const unitTable = new Table({ rows: unitRows, width: { size: 100, type: WidthType.PERCENTAGE } });
+
+  const typeHeading = new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('유형 분포')] });
+  const typeRows = [
+    new TableRow({ children: ['유형','문항수'].map(h => new TableCell({ children:[new Paragraph({children:[new TextRun({text:h,bold:true})]})] })) }),
+    ...(a.type_distribution||[]).map(t => new TableRow({ children: [
+      new TableCell({children:[new Paragraph(String(t.type||''))]}),
+      new TableCell({children:[new Paragraph(String(t.count??''))]})
+    ]}))
+  ];
+  const typeTable = new Table({ rows: typeRows, width: { size: 100, type: WidthType.PERCENTAGE } });
+
+  const itemHeading = new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('문항별 분석')] });
+  const itemHeader = new TableRow({ children: ['번호','단원','유형','배점','난이도','요약'].map(h =>
+    new TableCell({ children:[new Paragraph({children:[new TextRun({text:h,bold:true})]})] })
+  )});
+  const itemRows = (a.items||[]).map(it => new TableRow({ children: [
+    new TableCell({children:[new Paragraph(String(it.number??''))]}),
+    new TableCell({children:[new Paragraph(String(it.unit||''))]}),
+    new TableCell({children:[new Paragraph(String(it.type||''))]}),
+    new TableCell({children:[new Paragraph(String(it.points??''))]}),
+    new TableCell({children:[new Paragraph(String(it.difficulty||''))]}),
+    new TableCell({children:[new Paragraph(String(it.summary||''))]})
+  ]}));
+  const itemTable = new Table({ rows: [itemHeader, ...itemRows], width: { size: 100, type: WidthType.PERCENTAGE } });
+
+  const insightHeading = new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('출제 경향 코멘트')] });
+  const insightParas = (a.insights||[]).map(i => new Paragraph({ bullet: { level: 0 }, children: [new TextRun(i)] }));
+
+  const doc = new Document({
+    sections: [{
+      children: [
+        titlePara, subPara,
+        new Paragraph({ text: '' }),
+        unitHeading, unitTable,
+        new Paragraph({ text: '' }),
+        typeHeading, typeTable,
+        new Paragraph({ text: '' }),
+        itemHeading, itemTable,
+        new Paragraph({ text: '' }),
+        insightHeading, ...insightParas
+      ]
+    }]
+  });
+
+  return await Packer.toBlob(doc);
+}
+
+analyzeBtn.addEventListener('click', async () => {
+  if (!selectedFile) return;
+  errorBox.innerHTML = '';
+  reportEl.classList.remove('show');
+  emptyState.style.display = 'none';
+  stageBox.classList.add('show');
+  analyzeBtn.disabled = true;
+  analyzeBtn.textContent = '분석 중…';
+
+  try {
+    const images = await pdfToImages(selectedFile);
+    stageText.textContent = 'Claude가 문항을 분석하는 중… (시간이 걸릴 수 있어요)';
+    const analysis = await analyzeWithClaude(images, toggleDetail.checked);
+    lastAnalysis = analysis;
+    stageBox.classList.remove('show');
+    renderReport(analysis);
+  } catch (err) {
+    console.error(err);
+    stageBox.classList.remove('show');
+    emptyState.style.display = 'block';
+    showError('분석 중 오류가 발생했습니다: ' + err.message + ' — 파일을 다시 확인하거나 재시도해 주세요.');
+  } finally {
+    analyzeBtn.disabled = false;
+    analyzeBtn.textContent = '분석 시작';
+  }
+});
+</script>
+</body>
+</html>
