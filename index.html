@@ -395,7 +395,7 @@ async function analyzeWithClaude(images, includeDetail, attempt) {
 
   let response;
   try {
-    response = await fetch('/api/analyze', {
+    response = await fetch('https://exam-analyzer-production-732c.up.railway.app/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
