@@ -383,7 +383,7 @@ async function analyzeWithClaude(images, includeDetail, attempt) {
       "number": 문항번호,
       "unit": "단원명",
       "type": "유형",
-      "points": 배점,
+      "points": 배점 (소수점 그대로 유지. 예: 3.2, 4.0, 5.6 등 반드시 숫자로),
       "difficulty": "easy|mid|hard",
       "summary": "${includeDetail ? '한 줄 요약 설명 (원문 인용 없이 너의 표현으로, 20자 내외)' : ''}"
     }
