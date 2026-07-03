@@ -397,6 +397,8 @@
   }
   .diff-table td{padding:9px 4px;text-align:center;border-bottom:1px solid var(--line);font-family:'JetBrains Mono',monospace;}
   .diff-table td.final-diff{font-weight:700;color:var(--coral);font-family:'Pretendard',sans-serif;}
+  .hitrate-row{margin-top:12px;font-size:12.5px;color:var(--ink);}
+  .hitrate-row label{margin-right:8px;font-weight:600;}
   .source-input{
     width:100%;border:1px solid transparent;background:transparent;font-size:12px;color:var(--ink);
     padding:4px 6px;border-radius:3px;font-family:'Pretendard',sans-serif;
@@ -1431,6 +1433,10 @@ function renderReport(a) {
     </tr></thead><tbody><tr>
       ${DIFF_LEVELS.map(l => `<td>${diff[l] ?? 0}</td>`).join('')}<td class="final-diff">${a.final_difficulty || '-'}</td>
     </tr></tbody></table>
+    <div class="hitrate-row">
+      <label for="hitRateInput">자체교재 적중률 <span class="hint">(선택, 직접 입력)</span></label>
+      <input type="text" id="hitRateInput" class="source-input" style="max-width:120px;display:inline-block;" placeholder="예: 95%" value="${(a.hit_rate||'').replace(/"/g,'&quot;')}">
+    </div>
   </div>`;
 
   html += `<div class="section"><h3><span class="tag">CHART</span> 단원별 출제 비중</h3>`;
@@ -1498,12 +1504,16 @@ function renderReport(a) {
   showWizardStep('report');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  reportEl.querySelectorAll('.source-input').forEach(inp => {
+  reportEl.querySelectorAll('.source-input[data-idx]').forEach(inp => {
     inp.addEventListener('input', (e) => {
       const idx = Number(e.target.dataset.idx);
       if (a.items && a.items[idx]) a.items[idx].source = e.target.value;
     });
   });
+  const hitRateInput = document.getElementById('hitRateInput');
+  if (hitRateInput) {
+    hitRateInput.addEventListener('input', (e) => { a.hit_rate = e.target.value; });
+  }
 
   wireUpActions(a);
 }
@@ -1713,6 +1723,19 @@ function getThemeHexColors() {
   };
 }
 
+// 문항을 객관식/서답형으로 분류 (번호 라벨 또는 유형명에 서술형 관련 키워드가 있으면 서답형으로 판단)
+function splitObjSubj(items) {
+  const subjRe = /서술|서답|주관식|논술/;
+  const obj = { count: 0, points: 0 };
+  const subj = { count: 0, points: 0 };
+  (items || []).forEach(it => {
+    const isSubj = subjRe.test(String(it.number)) || subjRe.test(it.type || '');
+    const pts = Number(it.points) || 0;
+    if (isSubj) { subj.count++; subj.points += pts; } else { obj.count++; obj.points += pts; }
+  });
+  return { obj, subj };
+}
+
 // 워드에서 한글이 안정적으로 렌더링되도록 모든 런에 동일한 한/영 폰트를 명시.
 // '맑은 고딕'은 Windows/한글 기본 내장 폰트라 사용자 PC에 별도 설치 없이 그대로 보임.
 async function buildDocxBlob(a) {
@@ -1726,31 +1749,48 @@ async function buildDocxBlob(a) {
     shading: { fill: theme.navy },
     children: [new Paragraph({ children: [run(text, { bold: true, color: 'FFFFFF', size: 20 })] })]
   });
+  const labelCell = (text, span) => new TableCell({
+    columnSpan: span || 1,
+    shading: { fill: 'F0EDE2' },
+    children: [new Paragraph({ children: [run(text, { bold: true, size: 19 })] })]
+  });
+  const valueCell = (text, span) => new TableCell({
+    columnSpan: span || 1,
+    children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [run(String(text ?? ''), { size: 19 })] })]
+  });
 
   const titlePara = new Paragraph({
     children: [run(`${info.school||''} ${info.grade||''} ${info.subject||''} 시험 분석`, { bold: true, size: 40, color: theme.navy })]
   });
   const subPara = new Paragraph({
-    spacing: { after: info.scope ? 60 : 300 },
+    spacing: { after: 200 },
     children: [run(`${info.exam_name||''}  |  ${info.date||''}  |  총 ${info.total_questions||'-'}문항 / ${info.total_points||'-'}점`, { color: theme.muted, size: 20 })]
   });
-  const scopePara = info.scope ? new Paragraph({
-    spacing: { after: 300 },
-    children: [run(`시험범위: ${info.scope}`, { color: theme.muted, size: 20 })]
-  }) : null;
 
   const sectionHeading = (text) => new Paragraph({
     spacing: { before: 200, after: 120 },
     children: [run(text, { bold: true, size: 26, color: theme.navy })]
   });
 
+  // 요약표 — 학교/학년/학기 · 과목 · 시험범위 · 문제수 · 난이도별 구성 · 자체교재 적중률 (7열 기준 그리드)
   const diff = a.difficulty_summary || {};
-  const diffHeading = sectionHeading('난이도별 구성');
-  const diffRows = [
+  const { obj, subj } = splitObjSubj(a.items);
+  const summaryRows = [
+    new TableRow({ children: [
+      labelCell('학교/학년/학기'), valueCell(`${info.school||''}/${info.grade||''}/${info.exam_name||''}`, 3),
+      labelCell('과목'), valueCell(info.subject||'', 2)
+    ]}),
+    new TableRow({ children: [ labelCell('시험범위'), valueCell(info.scope||'-', 6) ]}),
+    new TableRow({ children: [ labelCell('객관식 문항수'), valueCell(`${obj.count}문항 (${Math.round(obj.points*10)/10}점)`, 6) ]}),
+    new TableRow({ children: [ labelCell('서답형 문항수'), valueCell(`${subj.count}문항 (${Math.round(subj.points*10)/10}점)`, 6) ]}),
     new TableRow({ children: [...DIFF_LEVELS, '최종난이도'].map(headerCell) }),
-    new TableRow({ children: [...DIFF_LEVELS.map(l => new TableCell({children:[cellPara(diff[l] ?? 0)]})), new TableCell({children:[cellPara(a.final_difficulty || '-')]})] })
+    new TableRow({ children: [
+      ...DIFF_LEVELS.map(l => valueCell(diff[l] ?? 0)),
+      new TableCell({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [run(a.final_difficulty || '-', { bold: true, color: theme.coral, size: 19 })] })] })
+    ]}),
+    ...(a.hit_rate ? [new TableRow({ children: [ labelCell('자체교재 적중률'), valueCell(a.hit_rate, 6) ]})] : [])
   ];
-  const diffTable = new Table({ rows: diffRows, width: { size: 100, type: WidthType.PERCENTAGE } });
+  const summaryTable = new Table({ rows: summaryRows, width: { size: 100, type: WidthType.PERCENTAGE } });
 
   const unitHeading = sectionHeading('단원별 출제 비중');
   const unitRows = [
@@ -1809,8 +1849,8 @@ async function buildDocxBlob(a) {
     },
     sections: [{
       children: [
-        titlePara, subPara, ...(scopePara ? [scopePara] : []),
-        diffHeading, diffTable,
+        titlePara, subPara,
+        summaryTable,
         new Paragraph({ text: '' }),
         unitHeading, unitTable,
         new Paragraph({ text: '' }),
