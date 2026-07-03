@@ -470,25 +470,20 @@
 
       <div class="field-row-2">
         <div class="field-row" style="margin-bottom:0;">
-          <label>학교급</label>
-          <select id="metaSchoolLevel">
-            <option value="중학교">중학교</option>
-            <option value="고등학교" selected>고등학교</option>
+          <label>학년</label>
+          <select id="metaGrade">
+            <option value="중1">중학교 1학년</option>
+            <option value="중2">중학교 2학년</option>
+            <option value="중3">중학교 3학년</option>
+            <option value="고1" selected>고등학교 1학년</option>
+            <option value="고2">고등학교 2학년</option>
+            <option value="고3">고등학교 3학년</option>
           </select>
         </div>
         <div class="field-row" style="margin-bottom:0;">
-          <label>학년</label>
-          <select id="metaGrade">
-            <option value="1학년">1학년</option>
-            <option value="2학년">2학년</option>
-            <option value="3학년">3학년</option>
-          </select>
+          <label>학교명</label>
+          <input type="text" id="metaSchool" placeholder="예: 검단고등학교">
         </div>
-      </div>
-
-      <div class="field-row">
-        <label>학교명</label>
-        <input type="text" id="metaSchool" placeholder="예: 검단고등학교">
       </div>
 
       <div class="field-row-2">
@@ -517,31 +512,40 @@
         <input type="date" id="metaDate">
       </div>
 
-      <div class="field-row-2">
-        <div class="field-row" style="margin-bottom:0;">
-          <label>과목</label>
-          <select id="metaSubject">
-            <option value="">과목 선택</option>
-          </select>
-          <input type="text" id="metaSubjectCustom" placeholder="과목명 직접 입력" style="margin-top:8px;display:none;">
-        </div>
-        <div class="field-row" style="margin-bottom:0;">
-          <label>출판사 <span class="hint">(선택)</span></label>
-          <select id="metaPublisher">
-            <option value="">선택 안 함</option>
-            <option value="미래엔">미래엔</option>
-            <option value="비상교육">비상교육</option>
-            <option value="동아출판">동아출판</option>
-            <option value="천재교육">천재교육</option>
-            <option value="지학사">지학사</option>
-            <option value="금성출판사">금성출판사</option>
-            <option value="와이비엠(YBM)">와이비엠(YBM)</option>
-            <option value="NE능률">NE능률</option>
-            <option value="창비교육">창비교육</option>
-            <option value="해냄에듀">해냄에듀</option>
-            <option value="기타/모름">기타/모름</option>
-          </select>
-        </div>
+      <div class="field-row">
+        <label>과목</label>
+        <select id="metaSubjectCategory">
+          <option value="국어">국어</option>
+          <option value="영어" selected>영어</option>
+          <option value="수학">수학</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+
+      <div class="field-row" id="publisherRow" style="display:none;">
+        <label>출판사 <span class="hint">(선택)</span></label>
+        <select id="metaPublisher">
+          <option value="">선택 안 함</option>
+          <option value="미래엔">미래엔</option>
+          <option value="비상교육">비상교육</option>
+          <option value="동아출판">동아출판</option>
+          <option value="천재교육">천재교육</option>
+          <option value="지학사">지학사</option>
+          <option value="금성출판사">금성출판사</option>
+          <option value="와이비엠(YBM)">와이비엠(YBM)</option>
+          <option value="NE능률">NE능률</option>
+          <option value="창비교육">창비교육</option>
+          <option value="해냄에듀">해냄에듀</option>
+          <option value="기타/모름">기타/모름</option>
+        </select>
+      </div>
+
+      <div class="field-row">
+        <label>세부 과목</label>
+        <select id="metaSubject">
+          <option value="">세부 과목 선택</option>
+        </select>
+        <input type="text" id="metaSubjectCustom" placeholder="과목명 직접 입력" style="margin-top:8px;display:none;">
       </div>
 
       <div class="field-row">
@@ -709,8 +713,11 @@ themeSwatches.addEventListener('click', (e) => {
 });
 
 // ====== 시험 정보 입력 (교과과정 단원 선택) ======
-// 2022 개정 교육과정 기준 대단원 목록. 학원마다 부르는 이름이 다를 수 있어 "직접 추가"로 보완 가능.
+// 국가 교육과정(2022 개정) 기준 대단원/과목명. 학원마다 부르는 이름이 다를 수 있어 "직접 추가"로 보완 가능.
+// 국어·영어는 교과서(출판사)별로 단원 구성이 크게 달라 과목명(교육과정상 공식 명칭)만 표준으로 제공하고,
+// 실제 Lesson/단원 목차는 "직접 추가"로 채워야 정확함 — 정확한 목차 데이터를 받으면 이후 반영 가능.
 const CURRICULUM = {
+  // 수학 - 고등
   '공통수학1': ['다항식의 연산','항등식과 나머지정리','인수분해','복소수와 이차방정식','이차방정식과 이차함수','여러 가지 방정식','여러 가지 부등식','경우의 수','행렬'],
   '공통수학2': ['평면좌표와 직선의 방정식','원의 방정식과 도형의 이동','집합과 명제','함수와 그래프','유리함수와 무리함수'],
   '대수': ['지수와 로그','지수함수와 로그함수','삼각함수','삼각함수의 활용','수열','수열의 합'],
@@ -718,27 +725,55 @@ const CURRICULUM = {
   '확률과 통계': ['경우의 수','확률','조건부확률','확률분포','통계적 추정'],
   '미적분II': ['수열의 극한','여러 가지 함수의 미분법','여러 가지 함수의 미분법의 활용','여러 가지 함수의 적분법'],
   '기하': ['이차곡선','평면벡터','공간도형과 공간좌표'],
-  '수학(중등)': ['수와 연산','문자와 식','함수','기하','확률과 통계'],
-  '국어': ['문학(시)','문학(소설)','문학(수필·극)','독서','문법','화법과 작문','매체'],
-  '영어': ['듣기·말하기','읽기','쓰기','문법','어휘'],
+  // 수학 - 중등 (학기별 국가교육과정 대단원, 출판사 공통)
+  '중1-1': ['소인수분해와 최대공약수·최소공배수','정수와 유리수','문자와 식','일차방정식','좌표평면과 그래프'],
+  '중1-2': ['정비례와 반비례','기본 도형','작도와 합동','평면도형의 성질','입체도형의 성질','자료의 정리와 해석'],
+  '중2-1': ['유리수와 순환소수','식의 계산','일차부등식','연립일차방정식','일차함수와 그래프'],
+  '중2-2': ['일차함수와 일차방정식의 관계','삼각형의 성질','사각형의 성질','도형의 닮음','확률'],
+  '중3-1': ['제곱근과 실수','다항식의 곱셈과 인수분해','이차방정식','이차함수와 그래프'],
+  '중3-2': ['삼각비','원의 성질','대푯값과 산포도','상관관계'],
+  // 국어 (교육과정 영역 기준 — 실제 목차는 교과서별 상이, 직접 추가로 보완 권장)
+  '국어(공통)': ['문학(시)','문학(소설)','문학(수필·극)','독서','문법','화법과 작문','매체'],
+  '공통국어1': ['문학(시)','문학(소설)','문학(수필·극)','독서','문법','화법과 언어'],
+  '공통국어2': ['문학(시)','문학(소설)','문학(수필·극)','독서','문법','화법과 언어'],
+  '문학': ['현대시','현대소설','고전시가','고전산문','수필·극'],
+  '독서와 작문': ['정보 전달의 글','설득하는 글','친교·정서 표현의 글','작문의 원리'],
+  '화법과 언어': ['화법의 원리','言어와 매체','국어 문법'],
+  // 영어 (교육과정 공식 과목명 — Lesson별 목차는 출판사별로 다름, 직접 추가로 보완 권장)
+  '영어(공통)': ['듣기·말하기','읽기','쓰기','문법','어휘'],
+  '공통영어1': ['듣기·말하기','읽기','쓰기','문법','어휘'],
+  '공통영어2': ['듣기·말하기','읽기','쓰기','문법','어휘'],
+  '영어Ⅰ': ['듣기·말하기','읽기','쓰기','문법','어휘'],
+  '영어Ⅱ': ['듣기·말하기','읽기','쓰기','문법','어휘'],
+  '영어 독해와 작문': ['독해','요약·서술형 작문','어휘·어법'],
+  '실용 영어': ['실생활 의사소통','듣기·말하기','실용문 독해'],
+  '영어 회화': ['듣기','말하기·발표'],
+  '진로 영어': ['진로 관련 독해','진로 관련 작문'],
+  '중1 교과서': ['듣기·말하기','읽기','쓰기','문법','어휘'],
+  '중2 교과서': ['듣기·말하기','읽기','쓰기','문법','어휘'],
+  '중3 교과서': ['듣기·말하기','읽기','쓰기','문법','어휘'],
+  // 기타
   '사회': ['정치와 법','경제','사회·문화','지리','역사'],
   '과학': ['물리','화학','생명과학','지구과학'],
   '기타(직접입력)': []
 };
 
-// 학교급별로 노출할 과목 목록 (실제 단원 데이터는 위 CURRICULUM 공용 사용, 없으면 직접 추가로 보완)
-const SUBJECTS_BY_LEVEL = {
-  '중학교': ['국어','영어','수학(중등)','사회','과학','기타(직접입력)'],
-  '고등학교': ['국어','영어','공통수학1','공통수학2','대수','미적분I','확률과 통계','미적분II','기하','사회','과학','기타(직접입력)']
+// 과목 대분류별 세부 과목 목록
+const SUBJECTS_BY_CATEGORY = {
+  '국어': ['국어(공통)','공통국어1','공통국어2','문학','독서와 작문','화법과 언어','기타(직접입력)'],
+  '영어': ['중1 교과서','중2 교과서','중3 교과서','공통영어1','공통영어2','영어Ⅰ','영어Ⅱ','영어 독해와 작문','실용 영어','영어 회화','진로 영어','기타(직접입력)'],
+  '수학': ['중1-1','중1-2','중2-1','중2-2','중3-1','중3-2','공통수학1','공통수학2','대수','미적분I','미적분II','확률과 통계','기하','기타(직접입력)'],
+  '기타': ['사회','과학','기타(직접입력)']
 };
 
-const metaSchoolLevel = document.getElementById('metaSchoolLevel');
 const metaSchool = document.getElementById('metaSchool');
 const metaGrade = document.getElementById('metaGrade');
 const metaSemester = document.getElementById('metaSemester');
 const metaExamType = document.getElementById('metaExamType');
 const metaExamTypeCustom = document.getElementById('metaExamTypeCustom');
 const metaDate = document.getElementById('metaDate');
+const metaSubjectCategory = document.getElementById('metaSubjectCategory');
+const publisherRow = document.getElementById('publisherRow');
 const metaSubject = document.getElementById('metaSubject');
 const metaSubjectCustom = document.getElementById('metaSubjectCustom');
 const metaPublisher = document.getElementById('metaPublisher');
@@ -752,18 +787,17 @@ const selectedUnitsView = document.getElementById('selectedUnitsView');
 let selectedUnits = [];
 
 function rebuildSubjectOptions() {
-  const level = metaSchoolLevel.value;
-  const prevValue = metaSubject.value;
-  const subjects = SUBJECTS_BY_LEVEL[level] || [];
-  metaSubject.innerHTML = '<option value="">과목 선택</option>' +
+  const category = metaSubjectCategory.value;
+  const subjects = SUBJECTS_BY_CATEGORY[category] || [];
+  metaSubject.innerHTML = '<option value="">세부 과목 선택</option>' +
     subjects.map(s => `<option value="${s}">${s}</option>`).join('');
-  // 이전 선택값이 새 목록에도 있으면 유지, 없으면 초기화
-  if (subjects.includes(prevValue)) metaSubject.value = prevValue;
-  else { selectedUnits = []; renderSelectedUnits(); }
-  metaSubjectCustom.style.display = (metaSubject.value === '기타(직접입력)') ? 'block' : 'none';
+  publisherRow.style.display = (category === '영어') ? 'block' : 'none';
+  selectedUnits = [];
+  renderSelectedUnits();
+  metaSubjectCustom.style.display = 'none';
   renderUnitChips();
 }
-metaSchoolLevel.addEventListener('change', rebuildSubjectOptions);
+metaSubjectCategory.addEventListener('change', rebuildSubjectOptions);
 rebuildSubjectOptions();
 
 function renderUnitChips() {
@@ -836,7 +870,7 @@ unitCustomInput.addEventListener('keydown', (e) => {
 function getExamMeta() {
   const examType = metaExamType.value === '기타' ? metaExamTypeCustom.value.trim() : metaExamType.value;
   return {
-    schoolLevel: metaSchoolLevel.value,
+    subjectCategory: metaSubjectCategory.value,
     school: metaSchool.value.trim(),
     grade: metaGrade.value,
     semester: metaSemester.value,
@@ -1199,9 +1233,20 @@ ${unitListText}
 - 손글씨로 채점/풀이 흔적이 있다면 무시하고 인쇄된 문제만 분석해.
 - 위에서 제공한 단원 목록이 있다면 반드시 그 목록 안에서만 단원을 분류해. 목록이 없을 때만 네가 판단해서 교과서 "대단원" 수준으로 묶어줘 (소단원으로 잘게 쪼개지 마).
 
+서술형/서답형 문항 인식 (중요):
+- 시험지 뒷부분이나 별도 페이지에 답을 직접 쓰는 줄/네모 칸이 있는 문항(객관식 선택지 ①~⑤가 없는 문항)은 서술형/서답형 문항이야. 반드시 놓치지 말고 전부 분석에 포함해.
+- 서술형 문항도 단원 분류, 배점, 난이도 분류를 객관식과 동일한 기준으로 수행해.
+- 서술형 문항의 "유형"은 단순히 "서술형"이라고만 쓰지 말고, 실제로 무엇을 요구하는지 구체화해 (예: "영작문(조건영작)", "어법 오류 찾기·고쳐쓰기", "본문 요약 서술", "풀이과정 서술형", "증명형" 등). 문제 내용을 보고 가장 정확한 표현을 사용해.
+
+문항 번호(number) 규칙 (매우 중요):
+- 시험지에 실제로 인쇄된 번호를 그대로 사용해. 절대 네가 처음부터 끝까지 순서대로 다시 세서 새 번호를 매기지 마.
+- 객관식이 1~20번이고 서술형/서답형이 별도로 1번부터 다시 시작한다면(예: "서술형 1", "서답형1", "주관식 1"), 그 라벨과 번호를 그대로 문자열로 써 (예: "서술형 1", "서술형 2"). 객관식 마지막 번호에 이어서 21, 22처럼 임의로 붙이지 마.
+- number 필드는 숫자여도 되고, 서술형처럼 라벨이 붙은 경우 문자열이어도 돼.
+
 난이도 분류 규칙 (중요, 6단계):
 - 난이도는 "하", "중하", "중", "중상", "상", "최상" 6단계로 분류해.
 - 절대 너의 주관적 풀이 난이도 인상만으로 판단하지 마. 배점이 가장 강력한 단서야 — 일반적으로 한국 고등 수학 시험은 문항이 뒤로 갈수록, 배점이 높을수록 어려워.
+- 지문/보기 길이만으로 난이도를 올리지 마. 영어 독해 지문이 길다고 자동으로 어려운 게 아니야 — 실제 요구되는 사고 과정(단순 정보 찾기 vs 추론·종합)을 기준으로 판단해.
 - 전체 문항을 배점과 문항 순서 기준으로 정렬했을 때: 상위 약 10~15%는 "최상", 다음 15%는 "상", 다음 20%는 "중상", 다음 20%는 "중", 다음 20%는 "중하", 나머지 하위는 "하"로 분류해 (문항 수가 적으면 비율을 유연하게 적용).
 - "최상"과 "상"을 과도하게 남발하지 마. 배점이 같으면 번호가 뒤인 것을 더 어려운 쪽으로 분류해.
 - 전체 문항 구성을 바탕으로 이 시험의 "최종난이도"도 하/중하/중/중상/상/최상 중 하나로 총평해줘.
@@ -1217,7 +1262,7 @@ ${unitListText}
     {"unit": "단원명", "count": 문항수, "points": 배점합}
   ],
   "type_distribution": [
-    {"type": "유형명(예: 단순계산/개념응용/복합고난도/도형/문장제)", "count": 문항수}
+    {"type": "유형명(예: 단순계산/개념응용/복합고난도/영작문/어법 교정/도형/문장제)", "count": 문항수}
   ],
   "difficulty_summary": {
     "하": 숫자, "중하": 숫자, "중": 숫자, "중상": 숫자, "상": 숫자, "최상": 숫자
@@ -1225,7 +1270,7 @@ ${unitListText}
   "final_difficulty": "하|중하|중|중상|상|최상 중 하나",
   "items": [
     {
-      "number": 문항번호,
+      "number": "시험지에 인쇄된 번호 그대로 (숫자 또는 '서술형 1'같은 문자열)",
       "unit": "단원명",
       "type": "유형",
       "points": 배점 (소수점 그대로 유지. 예: 3.2, 4.0, 5.6 등 반드시 숫자로),
