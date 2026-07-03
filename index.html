@@ -7,6 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Pretendard:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -239,6 +240,105 @@
     padding:14px 16px;font-size:13px;margin-bottom:18px;
   }
 
+  /* ---- Auth header ---- */
+  .auth-area{display:flex;align-items:center;gap:10px;font-family:'Pretendard',sans-serif;}
+  .auth-btn{
+    background:var(--navy);color:#fff;border:none;padding:9px 16px;border-radius:3px;
+    font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;
+  }
+  .auth-btn:hover{background:#26396B;}
+  .auth-btn.ghost{background:transparent;color:var(--navy);border:1px solid var(--navy);}
+  .auth-btn.ghost:hover{background:var(--line);}
+  .user-chip{
+    display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);
+  }
+  .user-chip .email{font-weight:700;color:var(--ink);}
+
+  /* ---- Auth modal ---- */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;background:rgba(20,18,14,.55);z-index:100;
+    align-items:center;justify-content:center;padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:var(--card);border-radius:6px;max-width:400px;width:100%;padding:30px 28px;
+    position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3);
+  }
+  .modal-close{
+    position:absolute;top:14px;right:16px;background:none;border:none;font-size:18px;
+    cursor:pointer;color:var(--muted);
+  }
+  .modal-box h2{font-family:'Noto Serif KR',serif;font-size:19px;margin:0 0 4px;color:var(--navy);}
+  .modal-sub{font-size:12px;color:var(--muted);margin:0 0 20px;}
+  .auth-tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:18px;}
+  .auth-tab{
+    flex:1;text-align:center;padding:10px 0;font-size:13px;font-weight:700;color:var(--muted);
+    cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;
+    font-family:'Pretendard',sans-serif;
+  }
+  .auth-tab.active{color:var(--navy);border-bottom-color:var(--coral);}
+  .auth-field{margin-bottom:12px;}
+  .auth-field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;}
+  .auth-field input{
+    width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:3px;font-size:13.5px;
+    font-family:'Pretendard',sans-serif;background:var(--paper);color:var(--ink);
+  }
+  .auth-field input:focus{outline:none;border-color:var(--coral);}
+  .auth-submit{
+    width:100%;background:var(--navy);color:#fff;border:none;padding:12px;border-radius:3px;
+    font-weight:700;font-size:13.5px;cursor:pointer;margin-top:6px;font-family:'Pretendard',sans-serif;
+  }
+  .auth-submit:hover{background:#26396B;}
+  .auth-submit:disabled{background:#C8C2B3;cursor:not-allowed;}
+  .auth-divider{
+    display:flex;align-items:center;gap:10px;margin:18px 0;font-size:11px;color:var(--muted);
+  }
+  .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line);}
+  .google-btn{
+    width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+    background:#fff;border:1px solid var(--line);border-radius:3px;padding:11px;cursor:pointer;
+    font-size:13px;font-weight:600;color:var(--ink);font-family:'Pretendard',sans-serif;
+  }
+  .google-btn:hover{background:#F7F5EF;}
+  .auth-error{
+    background:#FDECE6;border:1px solid #E8714A;color:#8A3517;border-radius:3px;
+    padding:9px 11px;font-size:12px;margin-bottom:12px;display:none;
+  }
+  .auth-error.show{display:block;}
+  .auth-switch{text-align:center;font-size:12px;color:var(--muted);margin-top:16px;}
+  .auth-switch a{color:var(--coral);font-weight:700;cursor:pointer;text-decoration:none;}
+
+  /* ---- Login-gate overlay on upload panel ---- */
+  .gate-overlay{
+    text-align:center;padding:40px 16px;
+  }
+  .gate-overlay .icon{font-size:34px;margin-bottom:12px;}
+  .gate-overlay p{color:var(--muted);font-size:13px;line-height:1.7;margin:0 0 18px;}
+
+  /* ---- My page ---- */
+  .mypage-list{display:flex;flex-direction:column;gap:10px;}
+  .mypage-item{
+    background:var(--card);border:1px solid var(--line);border-radius:4px;padding:16px 18px;
+    cursor:pointer;transition:border-color .15s;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  }
+  .mypage-item:hover{border-color:var(--coral);}
+  .mypage-item .mi-title{font-weight:700;font-size:14px;color:var(--ink);}
+  .mypage-item .mi-sub{font-size:11.5px;color:var(--muted);margin-top:3px;font-family:'JetBrains Mono',monospace;}
+  .mypage-item .mi-del{
+    background:none;border:1px solid var(--line);color:var(--muted);border-radius:3px;
+    padding:6px 10px;font-size:11px;cursor:pointer;flex:none;
+  }
+  .mypage-item .mi-del:hover{border-color:#E8714A;color:#E8714A;}
+  .mypage-empty{
+    border:1px dashed var(--line);border-radius:4px;padding:50px 20px;text-align:center;color:var(--muted);font-size:13px;
+  }
+  .nav-tabs{display:flex;gap:8px;margin-bottom:20px;}
+  .nav-tab{
+    background:var(--card);border:1px solid var(--line);color:var(--muted);padding:9px 18px;
+    border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;
+  }
+  .nav-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
   @media print{
     .panel.upload-panel, header.top, .actions{display:none !important;}
     body{background:#fff;}
@@ -253,14 +353,61 @@
       <span class="eyebrow">Exam Analyzer — Prototype</span>
       <h1>시험분석기</h1>
     </div>
-    <div class="top-right">선생님용 시험 분석 도구<br>MVP v0.1</div>
+    <div class="auth-area" id="authArea">
+      <button class="auth-btn ghost" id="loginBtn">로그인</button>
+      <button class="auth-btn" id="signupBtn">회원가입</button>
+    </div>
   </header>
 
-  <div class="layout">
+  <!-- 로그인/회원가입 모달 -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-box">
+      <button class="modal-close" id="authModalClose">✕</button>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" type="button">로그인</button>
+        <button class="auth-tab" id="tabSignup" type="button">회원가입</button>
+      </div>
+      <div class="auth-error" id="authError"></div>
 
-    <div class="panel upload-panel">
+      <button class="google-btn" id="googleLoginBtn">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.84 2.09-1.8 2.73v2.27h2.91c1.7-1.57 2.69-3.88 2.69-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.27c-.81.54-1.84.86-3.05.86-2.34 0-4.33-1.58-5.04-3.71H.95v2.34C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.96 10.7c-.18-.54-.28-1.11-.28-1.7s.1-1.16.28-1.7V4.96H.95C.35 6.17 0 7.55 0 9s.35 2.83.95 4.04l3.01-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.95 4.96l3.01 2.34C4.67 5.16 6.66 3.58 9 3.58z"/></svg>
+        구글로 계속하기
+      </button>
+
+      <div class="auth-divider">또는 이메일로</div>
+
+      <form id="authForm">
+        <div class="auth-field">
+          <label>이메일</label>
+          <input type="email" id="authEmail" required placeholder="teacher@academy.com">
+        </div>
+        <div class="auth-field">
+          <label>비밀번호</label>
+          <input type="password" id="authPassword" required placeholder="6자 이상" minlength="6">
+        </div>
+        <button class="auth-submit" id="authSubmitBtn" type="submit">로그인</button>
+      </form>
+      <p class="auth-switch" id="authSwitchLine">계정이 없으신가요? <a id="authSwitchLink">회원가입</a></p>
+    </div>
+  </div>
+
+  <div class="nav-tabs" id="navTabs">
+    <button class="nav-tab active" id="navNew">✨ 새 분석</button>
+    <button class="nav-tab" id="navMypage">🗂️ 마이페이지</button>
+  </div>
+
+  <div class="layout" id="analyzeView">
+
+    <div class="panel upload-panel" id="uploadPanel">
       <h2><span class="num">01</span> 시험지 업로드</h2>
 
+      <div class="gate-overlay" id="uploadGate" style="display:none;">
+        <div class="icon">🔒</div>
+        <p>시험지 분석은 로그인 후 이용할 수 있어요.<br>분석 이력은 마이페이지에 자동 저장됩니다.</p>
+        <button class="auth-btn" id="gateLoginBtn">로그인 / 회원가입</button>
+      </div>
+
+      <div id="uploadPanelBody">
       <div class="dropzone" id="dropzone">
         <div class="icon">📄</div>
         <p><strong>PDF 파일을 클릭하거나 끌어다 놓으세요</strong><br>스캔된 시험 문제지 (선택형/서답형 무관)</p>
@@ -303,6 +450,7 @@
         ⓘ 본 도구는 시험 문제 원문을 그대로 복제·전재하지 않고, 단원·유형·난이도 중심의 통계 분석 리포트를 생성합니다.
         생성된 리포트를 외부에 게시할 경우 학교 측 저작권 정책을 별도로 확인하시기 바랍니다.
       </p>
+      </div>
     </div>
 
     <div class="results-col">
@@ -324,10 +472,31 @@
     </div>
   </div>
 
+  <div id="mypageView" style="display:none;">
+    <div class="panel" style="margin-bottom:20px;">
+      <h2 style="margin-bottom:4px;"><span class="num">📁</span> 마이페이지</h2>
+      <p class="note" style="margin-top:6px;">지금까지 분석한 시험지 이력입니다. 클릭하면 리포트를 다시 볼 수 있어요.</p>
+    </div>
+    <div id="mypageBody">
+      <div class="mypage-empty">로그인하면 분석 이력이 여기에 표시됩니다.</div>
+    </div>
+  </div>
+
 </div>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+// ====== Supabase 설정 ======
+// TODO: 아래 두 값을 본인의 Supabase 프로젝트 값으로 교체하세요.
+// Supabase 대시보드 → Project Settings → API 에서 확인 가능합니다.
+const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // 예: https://xxxxxxxxxxxx.supabase.co
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const supabaseClient = (SUPABASE_URL.startsWith('http'))
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+
+let currentUser = null;
 
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
@@ -352,6 +521,239 @@ themeSwatches.addEventListener('click', (e) => {
   document.documentElement.setAttribute('data-theme', currentTheme);
   themeSwatches.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b === btn));
 });
+
+// ====== 인증 UI ======
+const authArea = document.getElementById('authArea');
+const authModal = document.getElementById('authModal');
+const authModalClose = document.getElementById('authModalClose');
+const loginBtn = document.getElementById('loginBtn');
+const signupBtn = document.getElementById('signupBtn');
+const gateLoginBtn = document.getElementById('gateLoginBtn');
+const tabLogin = document.getElementById('tabLogin');
+const tabSignup = document.getElementById('tabSignup');
+const authForm = document.getElementById('authForm');
+const authEmail = document.getElementById('authEmail');
+const authPassword = document.getElementById('authPassword');
+const authSubmitBtn = document.getElementById('authSubmitBtn');
+const authError = document.getElementById('authError');
+const authSwitchLine = document.getElementById('authSwitchLine');
+const authSwitchLink = document.getElementById('authSwitchLink');
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+const uploadGate = document.getElementById('uploadGate');
+const uploadPanelBody = document.getElementById('uploadPanelBody');
+const navNew = document.getElementById('navNew');
+const navMypage = document.getElementById('navMypage');
+const analyzeView = document.getElementById('analyzeView');
+const mypageView = document.getElementById('mypageView');
+const mypageBody = document.getElementById('mypageBody');
+
+let authMode = 'login'; // 'login' | 'signup'
+
+function requireSupabase() {
+  if (!supabaseClient) {
+    showAuthError('아직 Supabase 연동이 설정되지 않았어요. index.html 상단의 SUPABASE_URL / SUPABASE_ANON_KEY를 채워주세요.');
+    return false;
+  }
+  return true;
+}
+
+function openAuthModal(mode) {
+  setAuthMode(mode || 'login');
+  authModal.classList.add('show');
+}
+function closeAuthModal() {
+  authModal.classList.remove('show');
+  authError.classList.remove('show');
+  authForm.reset();
+}
+function setAuthMode(mode) {
+  authMode = mode;
+  authError.classList.remove('show');
+  if (mode === 'login') {
+    tabLogin.classList.add('active'); tabSignup.classList.remove('active');
+    authSubmitBtn.textContent = '로그인';
+    authSwitchLine.innerHTML = '계정이 없으신가요? <a id="authSwitchLink">회원가입</a>';
+  } else {
+    tabSignup.classList.add('active'); tabLogin.classList.remove('active');
+    authSubmitBtn.textContent = '회원가입';
+    authSwitchLine.innerHTML = '이미 계정이 있으신가요? <a id="authSwitchLink">로그인</a>';
+  }
+  document.getElementById('authSwitchLink').addEventListener('click', () => setAuthMode(mode === 'login' ? 'signup' : 'login'));
+}
+function showAuthError(msg) {
+  authError.textContent = msg;
+  authError.classList.add('show');
+}
+
+loginBtn.addEventListener('click', () => openAuthModal('login'));
+signupBtn.addEventListener('click', () => openAuthModal('signup'));
+gateLoginBtn.addEventListener('click', () => openAuthModal('login'));
+authModalClose.addEventListener('click', closeAuthModal);
+authModal.addEventListener('click', (e) => { if (e.target === authModal) closeAuthModal(); });
+tabLogin.addEventListener('click', () => setAuthMode('login'));
+tabSignup.addEventListener('click', () => setAuthMode('signup'));
+setAuthMode('login');
+
+authForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!requireSupabase()) return;
+  authError.classList.remove('show');
+  authSubmitBtn.disabled = true;
+  const email = authEmail.value.trim();
+  const password = authPassword.value;
+  try {
+    if (authMode === 'login') {
+      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } else {
+      const { error } = await supabaseClient.auth.signUp({ email, password });
+      if (error) throw error;
+      showAuthError('가입 확인 메일을 보냈어요. 메일함을 확인해 인증을 완료해주세요.');
+      authSubmitBtn.disabled = false;
+      return;
+    }
+    closeAuthModal();
+  } catch (err) {
+    showAuthError(err.message || '오류가 발생했습니다.');
+  } finally {
+    authSubmitBtn.disabled = false;
+  }
+});
+
+googleLoginBtn.addEventListener('click', async () => {
+  if (!requireSupabase()) return;
+  await supabaseClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + window.location.pathname }
+  });
+});
+
+function updateAuthUI(user) {
+  currentUser = user;
+  if (user) {
+    authArea.innerHTML = `
+      <div class="user-chip"><span class="email">${user.email}</span></div>
+      <button class="auth-btn ghost" id="logoutBtn">로그아웃</button>
+    `;
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabaseClient.auth.signOut();
+    });
+    uploadGate.style.display = 'none';
+    uploadPanelBody.style.display = 'block';
+  } else {
+    authArea.innerHTML = `
+      <button class="auth-btn ghost" id="loginBtn2">로그인</button>
+      <button class="auth-btn" id="signupBtn2">회원가입</button>
+    `;
+    document.getElementById('loginBtn2').addEventListener('click', () => openAuthModal('login'));
+    document.getElementById('signupBtn2').addEventListener('click', () => openAuthModal('signup'));
+    uploadGate.style.display = 'block';
+    uploadPanelBody.style.display = 'none';
+  }
+  if (!mypageView.style.display || mypageView.style.display !== 'none') {
+    loadMypage();
+  }
+}
+
+if (supabaseClient) {
+  supabaseClient.auth.getSession().then(({ data }) => updateAuthUI(data.session?.user || null));
+  supabaseClient.auth.onAuthStateChange((_event, session) => updateAuthUI(session?.user || null));
+} else {
+  updateAuthUI(null);
+}
+
+// ====== 새 분석 / 마이페이지 탭 전환 ======
+navNew.addEventListener('click', () => {
+  navNew.classList.add('active'); navMypage.classList.remove('active');
+  analyzeView.style.display = 'grid';
+  mypageView.style.display = 'none';
+});
+navMypage.addEventListener('click', () => {
+  navMypage.classList.add('active'); navNew.classList.remove('active');
+  analyzeView.style.display = 'none';
+  mypageView.style.display = 'block';
+  loadMypage();
+});
+
+// ====== 마이페이지: 분석 이력 저장/조회 ======
+async function saveAnalysisToHistory(a) {
+  if (!supabaseClient || !currentUser) return;
+  const info = a.exam_info || {};
+  try {
+    await supabaseClient.from('analyses').insert({
+      user_id: currentUser.id,
+      school: info.school || null,
+      grade: info.grade || null,
+      subject: info.subject || null,
+      exam_name: info.exam_name || null,
+      exam_date: info.date || null,
+      theme: currentTheme,
+      analysis: a
+    });
+  } catch (err) {
+    console.error('분석 이력 저장 실패:', err);
+  }
+}
+
+async function loadMypage() {
+  if (mypageView.style.display === 'none') return;
+  if (!supabaseClient) {
+    mypageBody.innerHTML = '<div class="mypage-empty">Supabase가 아직 연동되지 않았어요.</div>';
+    return;
+  }
+  if (!currentUser) {
+    mypageBody.innerHTML = '<div class="mypage-empty">로그인하면 분석 이력이 여기에 표시됩니다.</div>';
+    return;
+  }
+  mypageBody.innerHTML = '<div class="mypage-empty">불러오는 중…</div>';
+  const { data, error } = await supabaseClient
+    .from('analyses')
+    .select('id, school, grade, subject, exam_name, exam_date, theme, analysis, created_at')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    mypageBody.innerHTML = `<div class="mypage-empty">이력을 불러오지 못했습니다: ${error.message}</div>`;
+    return;
+  }
+  if (!data || !data.length) {
+    mypageBody.innerHTML = '<div class="mypage-empty">아직 분석한 시험지가 없어요. 새 분석을 시작해보세요!</div>';
+    return;
+  }
+  mypageBody.innerHTML = `<div class="mypage-list">${data.map(row => `
+    <div class="mypage-item" data-id="${row.id}">
+      <div>
+        <div class="mi-title">${row.school||''} ${row.grade||''} ${row.subject||''} ${row.exam_name||''}</div>
+        <div class="mi-sub">${row.exam_date||''} · ${new Date(row.created_at).toLocaleDateString('ko-KR')} 분석</div>
+      </div>
+      <button class="mi-del" data-id="${row.id}">삭제</button>
+    </div>
+  `).join('')}</div>`;
+
+  mypageBody.querySelectorAll('.mypage-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if (e.target.classList.contains('mi-del')) return;
+      const row = data.find(r => String(r.id) === item.dataset.id);
+      if (!row) return;
+      if (row.theme) {
+        currentTheme = row.theme;
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        themeSwatches.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === currentTheme));
+      }
+      lastAnalysis = row.analysis;
+      navNew.click();
+      renderReport(row.analysis);
+    });
+  });
+  mypageBody.querySelectorAll('.mi-del').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      if (!confirm('이 분석 이력을 삭제할까요?')) return;
+      await supabaseClient.from('analyses').delete().eq('id', id);
+      loadMypage();
+    });
+  });
+}
 
 dropzone.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
@@ -991,6 +1393,10 @@ async function buildPptxBlob(a) {
 
 analyzeBtn.addEventListener('click', async () => {
   if (!selectedFile) return;
+  if (supabaseClient && !currentUser) {
+    openAuthModal('login');
+    return;
+  }
   errorBox.innerHTML = '';
   reportEl.classList.remove('show');
   emptyState.style.display = 'none';
@@ -1005,6 +1411,7 @@ analyzeBtn.addEventListener('click', async () => {
     lastAnalysis = analysis;
     stageBox.classList.remove('show');
     renderReport(analysis);
+    saveAnalysisToHistory(analysis);
   } catch (err) {
     console.error(err);
     stageBox.classList.remove('show');
