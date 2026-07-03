@@ -220,8 +220,11 @@
     display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;
     background:#EDE7D6;color:var(--ink);
   }
+  .pill.hardest{background:#F8C9B8;color:#8A2E0E;}
   .pill.hard{background:#FBE3D8;color:#B8451E;}
+  .pill.midhigh{background:#F0E4F5;color:#7A4FA0;}
   .pill.mid{background:#E8E2F2;color:#5B4A8A;}
+  .pill.midlow{background:#E4EEF7;color:#3B6A94;}
   .pill.easy{background:#E2EFE5;color:var(--green);}
   .src-text{color:var(--muted);font-size:12px;font-style:italic;}
 
@@ -339,6 +342,77 @@
   }
   .nav-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
 
+  /* ---- Exam meta form ---- */
+  .left-col{display:flex;flex-direction:column;gap:20px;}
+  .field-row{margin-bottom:14px;}
+  .field-row label{display:block;font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+  .field-row .hint{font-weight:400;color:var(--muted);font-size:11px;margin-left:4px;}
+  .field-row input[type=text], .field-row input[type=date], .field-row select, .field-row textarea{
+    width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:3px;font-size:13px;
+    font-family:'Pretendard',sans-serif;background:var(--paper);color:var(--ink);
+  }
+  .field-row input:focus, .field-row select:focus, .field-row textarea:focus{outline:none;border-color:var(--coral);}
+  .field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .unit-picker{
+    border:1px solid var(--line);border-radius:4px;padding:10px;background:var(--paper);
+    max-height:190px;overflow-y:auto;
+  }
+  .unit-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .unit-chip{
+    display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--line);
+    border-radius:20px;padding:5px 10px 5px 12px;font-size:12px;cursor:pointer;user-select:none;
+  }
+  .unit-chip input{margin:0;accent-color:var(--navy);}
+  .unit-chip.checked{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .unit-add-row{display:flex;gap:6px;margin-top:4px;}
+  .unit-add-row input{flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:3px;font-size:12px;background:var(--card);}
+  .unit-add-row button{
+    background:var(--navy);color:#fff;border:none;padding:0 12px;border-radius:3px;font-size:12px;cursor:pointer;font-weight:700;
+  }
+  .selected-units{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+  .selected-unit-tag{
+    background:var(--navy);color:#fff;font-size:11px;padding:4px 9px;border-radius:12px;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .selected-unit-tag .x{cursor:pointer;font-weight:700;opacity:.8;}
+  .selected-unit-tag .x:hover{opacity:1;}
+  .no-units-msg{font-size:11.5px;color:var(--muted);}
+
+  .prep-entry{
+    border:1px solid var(--line);border-radius:4px;padding:12px;margin-bottom:10px;background:var(--paper);
+  }
+  .prep-entry-head{display:flex;gap:8px;margin-bottom:8px;}
+  .prep-entry-head input{flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:3px;font-size:12.5px;font-weight:700;background:var(--card);}
+  .prep-entry-head .prep-del{
+    background:none;border:1px solid var(--line);color:var(--muted);border-radius:3px;padding:0 10px;cursor:pointer;font-size:12px;
+  }
+  .prep-entry textarea{
+    width:100%;min-height:70px;padding:8px 9px;border:1px solid var(--line);border-radius:3px;font-size:12.5px;
+    font-family:'Pretendard',sans-serif;background:var(--card);resize:vertical;
+  }
+  .add-prep-btn{
+    width:100%;background:none;border:1.5px dashed var(--line);color:var(--muted);border-radius:4px;
+    padding:10px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;
+  }
+  .add-prep-btn:hover{border-color:var(--coral);color:var(--coral);}
+
+  /* ---- Report: difficulty breakdown table ---- */
+  .diff-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px;}
+  .diff-table th{
+    background:var(--navy);color:#fff;padding:8px 4px;font-size:11px;font-weight:700;text-align:center;
+  }
+  .diff-table td{padding:9px 4px;text-align:center;border-bottom:1px solid var(--line);font-family:'JetBrains Mono',monospace;}
+  .diff-table td.final-diff{font-weight:700;color:var(--coral);font-family:'Pretendard',sans-serif;}
+  .source-input{
+    width:100%;border:1px solid transparent;background:transparent;font-size:12px;color:var(--ink);
+    padding:4px 6px;border-radius:3px;font-family:'Pretendard',sans-serif;
+  }
+  .source-input:hover, .source-input:focus{border-color:var(--line);background:var(--paper);outline:none;}
+  .source-input::placeholder{color:#C8C2B3;}
+  .prep-view{margin-bottom:14px;}
+  .prep-view .pv-title{font-weight:700;font-size:13.5px;color:var(--navy);margin-bottom:6px;}
+  .prep-view .pv-content{font-size:13px;color:var(--ink);white-space:pre-wrap;line-height:1.7;}
+
   @media print{
     .panel.upload-panel, header.top, .actions{display:none !important;}
     body{background:#fff;}
@@ -398,8 +472,62 @@
 
   <div class="layout" id="analyzeView">
 
+    <div class="left-col">
+
+    <div class="panel" id="examMetaPanel">
+      <h2><span class="num">01</span> 시험 정보 입력</h2>
+
+      <div class="field-row-2">
+        <div class="field-row" style="margin-bottom:0;">
+          <label>학교명</label>
+          <input type="text" id="metaSchool" placeholder="예: 검단고등학교">
+        </div>
+        <div class="field-row" style="margin-bottom:0;">
+          <label>학년</label>
+          <input type="text" id="metaGrade" placeholder="예: 1학년">
+        </div>
+      </div>
+
+      <div class="field-row-2">
+        <div class="field-row" style="margin-bottom:0;">
+          <label>학기 / 시험</label>
+          <input type="text" id="metaExamName" placeholder="예: 1학기 중간고사">
+        </div>
+        <div class="field-row" style="margin-bottom:0;">
+          <label>시행일 <span class="hint">(선택)</span></label>
+          <input type="date" id="metaDate">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label>과목</label>
+        <select id="metaSubject">
+          <option value="">과목 선택</option>
+        </select>
+        <input type="text" id="metaSubjectCustom" placeholder="과목명 직접 입력" style="margin-top:8px;display:none;">
+      </div>
+
+      <div class="field-row">
+        <label>시험범위</label>
+        <input type="text" id="metaScope" placeholder="예: 다항식의 연산 ~ 이차방정식과 이차함수">
+      </div>
+
+      <div class="field-row">
+        <label>시험 범위 단원 선택 <span class="hint">(과목 선택 후 체크)</span></label>
+        <div class="unit-picker" id="unitPicker">
+          <div class="no-units-msg" id="unitPickerEmpty">먼저 과목을 선택해주세요.</div>
+          <div class="unit-chip-row" id="unitChipRow"></div>
+          <div class="unit-add-row">
+            <input type="text" id="unitCustomInput" placeholder="목록에 없는 단원 직접 추가">
+            <button type="button" id="unitCustomAdd">추가</button>
+          </div>
+        </div>
+        <div class="selected-units" id="selectedUnitsView"></div>
+      </div>
+    </div>
+
     <div class="panel upload-panel" id="uploadPanel">
-      <h2><span class="num">01</span> 시험지 업로드</h2>
+      <h2><span class="num">02</span> 시험지 업로드</h2>
 
       <div class="gate-overlay" id="uploadGate" style="display:none;">
         <div class="icon">🔒</div>
@@ -451,6 +579,14 @@
         생성된 리포트를 외부에 게시할 경우 학교 측 저작권 정책을 별도로 확인하시기 바랍니다.
       </p>
       </div>
+    </div>
+
+    <div class="panel" id="prepPanel">
+      <h2><span class="num">03</span> 이렇게 대비하였습니다 <span class="hint" style="font-weight:400;">(선택)</span></h2>
+      <div id="prepEntriesList"></div>
+      <button type="button" class="add-prep-btn" id="addPrepBtn">+ 대비 기간 추가</button>
+    </div>
+
     </div>
 
     <div class="results-col">
@@ -508,6 +644,7 @@ const stageText = document.getElementById('stageText');
 const reportEl = document.getElementById('report');
 const errorBox = document.getElementById('errorBox');
 const toggleDetail = document.getElementById('toggleDetail');
+const examMetaPanel = document.getElementById('examMetaPanel');
 
 let selectedFile = null;
 let lastAnalysis = null;
@@ -521,6 +658,154 @@ themeSwatches.addEventListener('click', (e) => {
   document.documentElement.setAttribute('data-theme', currentTheme);
   themeSwatches.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b === btn));
 });
+
+// ====== 시험 정보 입력 (교과과정 단원 선택) ======
+// 2022 개정 교육과정 기준 대단원 목록. 학원마다 부르는 이름이 다를 수 있어 "직접 추가"로 보완 가능.
+const CURRICULUM = {
+  '공통수학1': ['다항식의 연산','항등식과 나머지정리','인수분해','복소수와 이차방정식','이차방정식과 이차함수','여러 가지 방정식','여러 가지 부등식','경우의 수','행렬'],
+  '공통수학2': ['평면좌표와 직선의 방정식','원의 방정식과 도형의 이동','집합과 명제','함수와 그래프','유리함수와 무리함수'],
+  '대수': ['지수와 로그','지수함수와 로그함수','삼각함수','삼각함수의 활용','수열','수열의 합'],
+  '미적분I': ['함수의 극한과 연속','다항함수의 미분법','다항함수의 미분법의 활용','다항함수의 적분법'],
+  '확률과 통계': ['경우의 수','확률','조건부확률','확률분포','통계적 추정'],
+  '미적분II': ['수열의 극한','여러 가지 함수의 미분법','여러 가지 함수의 미분법의 활용','여러 가지 함수의 적분법'],
+  '기하': ['이차곡선','평면벡터','공간도형과 공간좌표'],
+  '기타(직접입력)': []
+};
+
+const metaSchool = document.getElementById('metaSchool');
+const metaGrade = document.getElementById('metaGrade');
+const metaExamName = document.getElementById('metaExamName');
+const metaDate = document.getElementById('metaDate');
+const metaSubject = document.getElementById('metaSubject');
+const metaSubjectCustom = document.getElementById('metaSubjectCustom');
+const metaScope = document.getElementById('metaScope');
+const unitPickerEmpty = document.getElementById('unitPickerEmpty');
+const unitChipRow = document.getElementById('unitChipRow');
+const unitCustomInput = document.getElementById('unitCustomInput');
+const unitCustomAdd = document.getElementById('unitCustomAdd');
+const selectedUnitsView = document.getElementById('selectedUnitsView');
+
+let selectedUnits = [];
+
+Object.keys(CURRICULUM).forEach(subject => {
+  const opt = document.createElement('option');
+  opt.value = subject;
+  opt.textContent = subject;
+  metaSubject.appendChild(opt);
+});
+
+function renderUnitChips() {
+  const subject = metaSubject.value;
+  const units = CURRICULUM[subject] || [];
+  if (!subject) {
+    unitPickerEmpty.style.display = 'block';
+    unitPickerEmpty.textContent = '먼저 과목을 선택해주세요.';
+    unitChipRow.innerHTML = '';
+    return;
+  }
+  unitPickerEmpty.style.display = units.length ? 'none' : 'block';
+  if (!units.length) unitPickerEmpty.textContent = '이 과목은 목록이 없어요. 아래에서 단원을 직접 추가해주세요.';
+  unitChipRow.innerHTML = units.map(u => `
+    <label class="unit-chip ${selectedUnits.includes(u) ? 'checked' : ''}" data-unit="${u}">
+      <input type="checkbox" ${selectedUnits.includes(u) ? 'checked' : ''}>${u}
+    </label>
+  `).join('');
+  unitChipRow.querySelectorAll('.unit-chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      const unit = chip.dataset.unit;
+      toggleUnit(unit);
+    });
+  });
+}
+
+function toggleUnit(unit) {
+  const idx = selectedUnits.indexOf(unit);
+  if (idx === -1) selectedUnits.push(unit);
+  else selectedUnits.splice(idx, 1);
+  renderUnitChips();
+  renderSelectedUnits();
+}
+
+function renderSelectedUnits() {
+  if (!selectedUnits.length) {
+    selectedUnitsView.innerHTML = '';
+    return;
+  }
+  selectedUnitsView.innerHTML = selectedUnits.map(u => `
+    <span class="selected-unit-tag">${u}<span class="x" data-unit="${u}">✕</span></span>
+  `).join('');
+  selectedUnitsView.querySelectorAll('.x').forEach(x => {
+    x.addEventListener('click', () => toggleUnit(x.dataset.unit));
+  });
+}
+
+metaSubject.addEventListener('change', () => {
+  metaSubjectCustom.style.display = (metaSubject.value === '기타(직접입력)') ? 'block' : 'none';
+  renderUnitChips();
+});
+unitCustomAdd.addEventListener('click', () => {
+  const val = unitCustomInput.value.trim();
+  if (!val) return;
+  if (!selectedUnits.includes(val)) selectedUnits.push(val);
+  unitCustomInput.value = '';
+  renderUnitChips();
+  renderSelectedUnits();
+});
+unitCustomInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); unitCustomAdd.click(); }
+});
+
+function getExamMeta() {
+  return {
+    school: metaSchool.value.trim(),
+    grade: metaGrade.value.trim(),
+    examName: metaExamName.value.trim(),
+    date: metaDate.value,
+    subject: metaSubject.value === '기타(직접입력)' ? metaSubjectCustom.value.trim() : metaSubject.value,
+    scope: metaScope.value.trim(),
+    units: [...selectedUnits]
+  };
+}
+
+// ====== 이렇게 대비하였습니다 (강사 대비 내용) ======
+const prepEntriesList = document.getElementById('prepEntriesList');
+const addPrepBtn = document.getElementById('addPrepBtn');
+let prepEntries = [];
+let prepIdCounter = 0;
+
+function addPrepEntry(title, content) {
+  prepIdCounter += 1;
+  prepEntries.push({ id: prepIdCounter, title: title || '', content: content || '' });
+  renderPrepEntries();
+}
+function renderPrepEntries() {
+  prepEntriesList.innerHTML = prepEntries.map(entry => `
+    <div class="prep-entry" data-id="${entry.id}">
+      <div class="prep-entry-head">
+        <input type="text" class="prep-title" placeholder="기간 (예: 겨울방학, 3월 E반)" value="${entry.title.replace(/"/g,'&quot;')}">
+        <button type="button" class="prep-del">삭제</button>
+      </div>
+      <textarea class="prep-content" placeholder="어떤 교재로, 어떻게 대비했는지 자유롭게 적어주세요.">${entry.content}</textarea>
+    </div>
+  `).join('');
+  prepEntriesList.querySelectorAll('.prep-entry').forEach(el => {
+    const id = Number(el.dataset.id);
+    el.querySelector('.prep-title').addEventListener('input', (e) => {
+      const entry = prepEntries.find(p => p.id === id);
+      if (entry) entry.title = e.target.value;
+    });
+    el.querySelector('.prep-content').addEventListener('input', (e) => {
+      const entry = prepEntries.find(p => p.id === id);
+      if (entry) entry.content = e.target.value;
+    });
+    el.querySelector('.prep-del').addEventListener('click', () => {
+      prepEntries = prepEntries.filter(p => p.id !== id);
+      renderPrepEntries();
+    });
+  });
+}
+addPrepBtn.addEventListener('click', () => addPrepEntry('', ''));
 
 // ====== 인증 UI ======
 const authArea = document.getElementById('authArea');
@@ -803,41 +1088,45 @@ async function pdfToImages(file) {
   return images;
 }
 
-async function analyzeWithClaude(images, includeDetail, attempt) {
+async function analyzeWithClaude(images, includeDetail, examMeta, attempt) {
   attempt = attempt || 1;
   const content = images.map(img => ({
     type: 'image',
     source: { type: 'base64', media_type: 'image/jpeg', data: img }
   }));
 
+  const unitListText = examMeta.units.length
+    ? examMeta.units.map(u => `- ${u}`).join('\n')
+    : '(선생님이 단원을 지정하지 않았으니, 과목의 일반적인 대단원 체계를 기준으로 네가 직접 분류해줘)';
+
   const prompt = `너는 한국 중고등학교 시험지를 분석하는 교육 데이터 분석가야. 첨부된 시험지 이미지를 보고 분석해줘.
+
+선생님이 미리 입력한 시험 정보 (이 정보를 신뢰하고 그대로 활용해):
+- 학교: ${examMeta.school || '(미입력)'}
+- 학년: ${examMeta.grade || '(미입력)'}
+- 학기/시험: ${examMeta.examName || '(미입력)'}
+- 과목: ${examMeta.subject || '(미입력)'}
+- 시험범위: ${examMeta.scope || '(미입력)'}
+- 이 시험범위에 해당하는 단원 목록 (반드시 이 목록의 단원명만 사용해서 분류해. 목록에 없는 단원명을 새로 만들지 마):
+${unitListText}
 
 중요한 규칙:
 - 문제의 원문(지문, 보기, 선택지, 그림 설명 등)을 그대로 옮겨 적지 마. 저작권 보호 대상이야.
 - 대신 각 문항이 어떤 단원/개념을 다루는지, 어떤 유형(계산/응용/복합/도형/서술형 등)인지, 난이도가 어느 정도인지를 너의 표현으로 요약해.
 - 손글씨로 채점/풀이 흔적이 있다면 무시하고 인쇄된 문제만 분석해.
+- 위에서 제공한 단원 목록이 있다면 반드시 그 목록 안에서만 단원을 분류해. 목록이 없을 때만 네가 판단해서 교과서 "대단원" 수준으로 묶어줘 (소단원으로 잘게 쪼개지 마).
 
-단원 분류 규칙 (중요):
-- 단원은 세부 소단원이 아니라 교과서 "대단원" 수준으로 묶어줘. 너무 잘게 쪼개지 마.
-- 예를 들어 공통수학1이라면 "행렬", "여러 가지 방정식", "여러 가지 부등식", "경우의 수", "이차방정식과 이차함수" 정도의 큰 범주로 묶고, "이차부등식", "연립부등식", "절댓값 부등식"처럼 세분화하지 마 — 이런 건 모두 "여러 가지 부등식"으로 묶어.
-- 과목이 다르면 그 과목의 실제 교과서 대단원 체계를 기준으로 동일하게 적용해.
-
-난이도 분류 규칙 (중요):
-- 절대 너의 주관적 풀이 난이도 인상만으로 판단하지 마. 다음 기준을 우선 적용해:
-  1) 배점이 가장 강력한 단서야. 일반적으로 한국 고등 수학 시험은 문항이 뒤로 갈수록, 배점이 높을수록 어려워. 전체 문항을 배점 기준으로 정렬했을 때 상위 약 20%만 "hard"로 분류해.
-  2) 배점이 중간 구간(전체의 중간 40~50%)인 문항은 "mid"로 분류해.
-  3) 배점이 낮은 하위 약 30~40% 문항(보통 시험 앞부분)은 "easy"로 분류해.
-  4) "hard"를 과도하게 남발하지 마 — 전체 21문항 기준 최대 4~5문항만 hard야. 배점이 같으면 번호가 뒤인 것을 hard에 가깝게 분류해. 계산이 복잡해 보인다는 이유만으로 hard로 분류하지 마.
+난이도 분류 규칙 (중요, 6단계):
+- 난이도는 "하", "중하", "중", "중상", "상", "최상" 6단계로 분류해.
+- 절대 너의 주관적 풀이 난이도 인상만으로 판단하지 마. 배점이 가장 강력한 단서야 — 일반적으로 한국 고등 수학 시험은 문항이 뒤로 갈수록, 배점이 높을수록 어려워.
+- 전체 문항을 배점과 문항 순서 기준으로 정렬했을 때: 상위 약 10~15%는 "최상", 다음 15%는 "상", 다음 20%는 "중상", 다음 20%는 "중", 다음 20%는 "중하", 나머지 하위는 "하"로 분류해 (문항 수가 적으면 비율을 유연하게 적용).
+- "최상"과 "상"을 과도하게 남발하지 마. 배점이 같으면 번호가 뒤인 것을 더 어려운 쪽으로 분류해.
+- 전체 문항 구성을 바탕으로 이 시험의 "최종난이도"도 하/중하/중/중상/상/최상 중 하나로 총평해줘.
 
 다음 JSON 형식으로만 응답해. 다른 텍스트는 절대 포함하지 마:
 
 {
   "exam_info": {
-    "school": "학교명",
-    "grade": "학년",
-    "subject": "과목명",
-    "exam_name": "고사명(예: 1학기 기말고사)",
-    "date": "시행일",
     "total_questions": 숫자,
     "total_points": 숫자
   },
@@ -848,17 +1137,16 @@ async function analyzeWithClaude(images, includeDetail, attempt) {
     {"type": "유형명(예: 단순계산/개념응용/복합고난도/도형/문장제)", "count": 문항수}
   ],
   "difficulty_summary": {
-    "easy_count": 숫자,
-    "mid_count": 숫자,
-    "hard_count": 숫자
+    "하": 숫자, "중하": 숫자, "중": 숫자, "중상": 숫자, "상": 숫자, "최상": 숫자
   },
+  "final_difficulty": "하|중하|중|중상|상|최상 중 하나",
   "items": [
     {
       "number": 문항번호,
       "unit": "단원명",
       "type": "유형",
       "points": 배점 (소수점 그대로 유지. 예: 3.2, 4.0, 5.6 등 반드시 숫자로),
-      "difficulty": "easy|mid|hard",
+      "difficulty": "하|중하|중|중상|상|최상",
       "summary": "${includeDetail ? '한 줄 요약 설명 (원문 인용 없이 너의 표현으로, 20자 내외)' : ''}"
     }
   ],
@@ -883,7 +1171,7 @@ async function analyzeWithClaude(images, includeDetail, attempt) {
   } catch (networkErr) {
     if (attempt < 3) {
       await new Promise(r => setTimeout(r, 1200));
-      return analyzeWithClaude(images, includeDetail, attempt + 1);
+      return analyzeWithClaude(images, includeDetail, examMeta, attempt + 1);
     }
     throw new Error('네트워크 요청이 끊겼습니다 (이미지 용량이 너무 크거나 일시적 연결 문제일 수 있어요). 페이지 수가 적은 시험지로 먼저 테스트해보거나, 잠시 후 다시 시도해 주세요. (' + networkErr.message + ')');
   }
@@ -906,18 +1194,38 @@ async function analyzeWithClaude(images, includeDetail, attempt) {
     throw new Error('응답에서 JSON 형식을 찾을 수 없습니다. 원본 응답: ' + text.slice(0, 300));
   }
   const clean = text.slice(firstBrace, lastBrace + 1);
+  let parsed;
   try {
-    return JSON.parse(clean);
+    parsed = JSON.parse(clean);
   } catch (e) {
     throw new Error('JSON 파싱 실패: ' + e.message + ' / 원본 일부: ' + clean.slice(0,300));
   }
+
+  // 선생님이 입력한 시험 정보를 신뢰의 원천(source of truth)으로 사용 — AI가 OCR로 잘못 읽을 여지를 제거
+  parsed.exam_info = Object.assign({}, parsed.exam_info, {
+    school: examMeta.school,
+    grade: examMeta.grade,
+    subject: examMeta.subject,
+    exam_name: examMeta.examName,
+    date: examMeta.date || (parsed.exam_info && parsed.exam_info.date) || '',
+    scope: examMeta.scope
+  });
+  // 출처는 AI가 알 수 없는 정보라 항상 빈 값으로 시작 — 선생님이 리포트에서 직접 채워넣음
+  (parsed.items || []).forEach(it => { it.source = it.source || ''; });
+  parsed.prep_entries = prepEntries.filter(p => p.title.trim() || p.content.trim());
+
+  return parsed;
 }
 
 function difficultyLabel(d) {
-  if (d === 'hard') return '<span class="pill hard">고난도</span>';
-  if (d === 'mid') return '<span class="pill mid">중간</span>';
-  return '<span class="pill easy">기본</span>';
+  const map = {
+    '최상': 'hardest', '상': 'hard', '중상': 'midhigh', '중': 'mid', '중하': 'midlow', '하': 'easy'
+  };
+  const cls = map[d] || 'mid';
+  return `<span class="pill ${cls}">${d || '중'}</span>`;
 }
+
+const DIFF_LEVELS = ['하','중하','중','중상','상','최상'];
 
 function renderReport(a) {
   const info = a.exam_info || {};
@@ -929,16 +1237,26 @@ function renderReport(a) {
     <div>
       <div class="meta-title">${info.school || '학교명 미상'} · ${info.grade || ''} ${info.subject || ''}</div>
       <div class="meta-sub">${info.exam_name || ''} ${info.date ? '· ' + info.date : ''} · 총 ${info.total_questions || '-'}문항 · ${info.total_points || '-'}점</div>
+      ${info.scope ? `<div class="meta-sub" style="margin-top:4px;">시험범위: ${info.scope}</div>` : ''}
     </div>
     <div class="seal">분석<br>완료</div>
   </div>`;
 
   const diff = a.difficulty_summary || {};
+  const hardishCount = (diff['상']||0) + (diff['최상']||0);
   html += `<div class="stat-row">
     <div class="stat-card"><div class="num">${info.total_questions ?? '-'}</div><div class="lbl">전체 문항 수</div></div>
-    <div class="stat-card"><div class="num">${diff.hard_count ?? '-'}</div><div class="lbl">고난도 문항</div></div>
+    <div class="stat-card"><div class="num">${hardishCount}</div><div class="lbl">고난도(상·최상) 문항</div></div>
     <div class="stat-card"><div class="num">${(a.unit_distribution||[]).length}</div><div class="lbl">출제 단원 수</div></div>
     <div class="stat-card"><div class="num">${info.total_points ?? '-'}</div><div class="lbl">총 배점</div></div>
+  </div>`;
+
+  html += `<div class="section"><h3><span class="tag">LEVEL</span> 난이도별 구성</h3>
+    <table class="diff-table"><thead><tr>
+      ${DIFF_LEVELS.map(l => `<th>${l}</th>`).join('')}<th>최종난이도</th>
+    </tr></thead><tbody><tr>
+      ${DIFF_LEVELS.map(l => `<td>${diff[l] ?? 0}</td>`).join('')}<td class="final-diff">${a.final_difficulty || '-'}</td>
+    </tr></tbody></table>
   </div>`;
 
   html += `<div class="section"><h3><span class="tag">CHART</span> 단원별 출제 비중</h3>`;
@@ -960,9 +1278,9 @@ function renderReport(a) {
 
   html += `<div class="section"><h3><span class="tag">LIST</span> 문항별 분석</h3>
     <table class="items"><thead><tr>
-      <th>번호</th><th>단원</th><th>유형</th><th>배점</th><th>난이도</th><th>요약</th>
+      <th>번호</th><th>단원</th><th>유형</th><th>배점</th><th>난이도</th><th>요약</th><th>출처</th>
     </tr></thead><tbody>`;
-  (a.items||[]).forEach(it => {
+  (a.items||[]).forEach((it, idx) => {
     html += `<tr>
       <td class="num-cell">${it.number}</td>
       <td>${it.unit||''}</td>
@@ -970,6 +1288,7 @@ function renderReport(a) {
       <td>${it.points ?? ''}</td>
       <td>${difficultyLabel(it.difficulty)}</td>
       <td class="src-text">${it.summary||''}</td>
+      <td><input type="text" class="source-input" data-idx="${idx}" placeholder="예: 유형 아카이브" value="${(it.source||'').replace(/"/g,'&quot;')}"></td>
     </tr>`;
   });
   html += `</tbody></table></div>`;
@@ -981,34 +1300,61 @@ function renderReport(a) {
     html += `</ul></div>`;
   }
 
+  if (a.prep_entries && a.prep_entries.length) {
+    html += `<div class="section"><h3><span class="tag">PREP</span> 이렇게 대비하였습니다</h3>`;
+    a.prep_entries.forEach(p => {
+      html += `<div class="prep-view">
+        <div class="pv-title">${p.title || ''}</div>
+        <div class="pv-content">${(p.content||'').replace(/</g,'&lt;')}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
   html += `<div class="actions" style="flex-wrap:wrap;">
     <a class="btn-outline" id="manuscriptLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">✍️ 블로그 원고 다운로드</a>
     <a class="btn-outline" id="mdLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">📝 마크다운 다운로드</a>
     <a class="btn-outline" id="docxLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">📄 워드(.docx) 다운로드</a>
-    <a class="btn-outline" id="pptxLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">🖥️ PPT 다운로드 준비 중…</a>
-    <a class="btn-solid" id="pdfLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">📑 PDF 다운로드 준비 중…</a>
+    <a class="btn-outline" id="pptxLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">🖥️ PPT 다운로드</a>
+    <a class="btn-solid" id="pdfLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">📑 PDF 다운로드</a>
   </div>
-  <p class="note" style="margin-top:14px;">ⓘ .docx 파일은 한글(HWP) 프로그램에서도 그대로 열어 편집할 수 있습니다. 버튼 클릭 후 다운로드가 시작되지 않으면, 버튼을 한 번 더 클릭해 파일 준비를 기다려주세요.</p>`;
+  <p class="note" style="margin-top:14px;">ⓘ 출처 칸은 직접 입력할 수 있어요 — 입력 후 바로 다운로드하면 반영됩니다. .docx 파일은 한글(HWP) 프로그램에서도 그대로 열어 편집할 수 있습니다.</p>`;
 
   reportEl.innerHTML = html;
   reportEl.classList.add('show');
   emptyState.style.display = 'none';
+
+  reportEl.querySelectorAll('.source-input').forEach(inp => {
+    inp.addEventListener('input', (e) => {
+      const idx = Number(e.target.dataset.idx);
+      if (a.items && a.items[idx]) a.items[idx].source = e.target.value;
+    });
+  });
+
   wireUpActions(a);
 }
 
 function buildMarkdownString(a) {
   const info = a.exam_info || {};
+  const diff = a.difficulty_summary || {};
   let md = `# ${info.school||''} ${info.grade||''} ${info.subject||''} 시험 분석\n\n`;
   md += `**${info.exam_name||''}** | ${info.date||''} | 총 ${info.total_questions||'-'}문항 / ${info.total_points||'-'}점\n\n`;
+  if (info.scope) md += `**시험범위**: ${info.scope}\n\n`;
+  md += `## 난이도별 구성\n\n| ${DIFF_LEVELS.join(' | ')} | 최종난이도 |\n|${DIFF_LEVELS.map(()=>'---').join('|')}|---|\n`;
+  md += `| ${DIFF_LEVELS.map(l => diff[l] ?? 0).join(' | ')} | ${a.final_difficulty || '-'} |\n\n`;
   md += `## 단원별 출제 비중\n\n`;
   (a.unit_distribution||[]).forEach(u => md += `- ${u.unit}: ${u.count}문항 (${u.points ?? '-'}점)\n`);
   md += `\n## 유형 분포\n\n`;
   (a.type_distribution||[]).forEach(t => md += `- ${t.type}: ${t.count}문항\n`);
-  md += `\n## 문항별 분석\n\n| 번호 | 단원 | 유형 | 배점 | 난이도 | 요약 |\n|---|---|---|---|---|---|\n`;
-  (a.items||[]).forEach(it => md += `| ${it.number} | ${it.unit||''} | ${it.type||''} | ${it.points??''} | ${it.difficulty||''} | ${it.summary||''} |\n`);
+  md += `\n## 문항별 분석\n\n| 번호 | 단원 | 유형 | 배점 | 난이도 | 요약 | 출처 |\n|---|---|---|---|---|---|---|\n`;
+  (a.items||[]).forEach(it => md += `| ${it.number} | ${it.unit||''} | ${it.type||''} | ${it.points??''} | ${it.difficulty||''} | ${it.summary||''} | ${it.source||''} |\n`);
   if (a.insights && a.insights.length) {
     md += `\n## 출제 경향 코멘트\n\n`;
     a.insights.forEach(i => md += `- ${i}\n`);
+  }
+  if (a.prep_entries && a.prep_entries.length) {
+    md += `\n## 이렇게 대비하였습니다\n\n`;
+    a.prep_entries.forEach(p => md += `### ${p.title||''}\n\n${p.content||''}\n\n`);
   }
   return md;
 }
@@ -1045,8 +1391,11 @@ function buildManuscriptString(a) {
   }
 
   let diffPara = '';
-  if (diff.easy_count != null || diff.mid_count != null || diff.hard_count != null) {
-    diffPara = `난이도 측면에서는 기본 문항 ${diff.easy_count ?? 0}개, 중간 난이도 문항 ${diff.mid_count ?? 0}개, 고난도 문항 ${diff.hard_count ?? 0}개로 나뉘며, 상위권 변별을 위한 고난도 문항의 비중을 함께 눈여겨볼 필요가 있습니다.`;
+  const hardCount = (diff['상']||0) + (diff['최상']||0);
+  const easyCount = (diff['하']||0) + (diff['중하']||0);
+  const midCount = diff['중'] || 0;
+  if (Object.keys(diff).length) {
+    diffPara = `난이도 측면에서는 기본 문항 ${easyCount}개, 중간 난이도 문항 ${midCount}개, 고난도(상·최상) 문항 ${hardCount}개로 나뉘며${a.final_difficulty ? `, 전체적으로 '${a.final_difficulty}' 수준의 시험이었습니다` : ''}. 상위권 변별을 위한 고난도 문항의 비중을 함께 눈여겨볼 필요가 있습니다.`;
   }
 
   let body = `# ${title}\n\n`;
@@ -1057,70 +1406,89 @@ function buildManuscriptString(a) {
     a.insights.forEach(i => { body += `${i}\n\n`; });
   }
 
+  if (a.prep_entries && a.prep_entries.length) {
+    body += `## 이렇게 대비하였습니다\n\n`;
+    a.prep_entries.forEach(p => { body += `**${p.title||''}**\n${p.content||''}\n\n`; });
+  }
+
   body += `이상으로 ${info.school||'이번'} ${info.exam_name||'시험'} 출제 경향 분석을 마칩니다. 다음 시험 대비 학습 방향이 궁금하신 학부모님과 학생분들은 언제든 편하게 문의해 주세요.\n`;
 
   return body;
+}
+
+function triggerDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
 }
 
 function wireUpActions(a) {
   const info = a.exam_info || {};
   const safeName = (info.school||'exam').replace(/[^a-zA-Z0-9가-힣]/g,'_');
 
-  // 마크다운: 즉시 생성 가능
-  const mdBlob = new Blob([buildMarkdownString(a)], {type: 'text/markdown'});
   const mdLink = document.getElementById('mdLink');
-  mdLink.href = URL.createObjectURL(mdBlob);
-  mdLink.download = `exam_analysis_${safeName}.md`;
+  mdLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    triggerDownload(new Blob([buildMarkdownString(a)], {type: 'text/markdown'}), `exam_analysis_${safeName}.md`);
+  });
 
-  // 블로그 원고: 즉시 생성 가능
-  const manuscriptBlob = new Blob([buildManuscriptString(a)], {type: 'text/plain;charset=utf-8'});
   const manuscriptLink = document.getElementById('manuscriptLink');
-  manuscriptLink.href = URL.createObjectURL(manuscriptBlob);
-  manuscriptLink.download = `blog_draft_${safeName}.txt`;
+  manuscriptLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    triggerDownload(new Blob([buildManuscriptString(a)], {type: 'text/plain;charset=utf-8'}), `blog_draft_${safeName}.txt`);
+  });
 
-  // pptx: 비동기 생성
   const pptxLink = document.getElementById('pptxLink');
-  pptxLink.addEventListener('click', (e) => {
-    if (!pptxLink.href || pptxLink.href.endsWith('#')) e.preventDefault();
-  });
-  buildPptxBlob(a).then(blob => {
-    pptxLink.href = URL.createObjectURL(blob);
-    pptxLink.download = `exam_analysis_${safeName}.pptx`;
-    pptxLink.textContent = '🖥️ PPT 다운로드';
-  }).catch(err => {
-    pptxLink.textContent = '⚠ PPT 생성 실패';
-    console.error(err);
+  pptxLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const original = pptxLink.textContent;
+    pptxLink.textContent = '🖥️ PPT 생성 중…';
+    try {
+      const blob = await buildPptxBlob(a);
+      triggerDownload(blob, `exam_analysis_${safeName}.pptx`);
+      pptxLink.textContent = original;
+    } catch (err) {
+      pptxLink.textContent = '⚠ PPT 생성 실패';
+      console.error(err);
+      setTimeout(() => pptxLink.textContent = original, 2500);
+    }
   });
 
-  // docx: 비동기 생성, 준비되면 href 연결. 그 전에 클릭하면 안내.
   const docxLink = document.getElementById('docxLink');
-  docxLink.textContent = '📄 워드(.docx) 준비 중…';
-  docxLink.style.opacity = '0.6';
-  docxLink.addEventListener('click', (e) => {
-    if (!docxLink.href || docxLink.href.endsWith('#')) e.preventDefault();
-  });
-  buildDocxBlob(a).then(blob => {
-    docxLink.href = URL.createObjectURL(blob);
-    docxLink.download = `exam_analysis_${safeName}.docx`;
-    docxLink.textContent = '📄 워드(.docx) 다운로드';
-    docxLink.style.opacity = '1';
-  }).catch(err => {
-    docxLink.textContent = '⚠ 워드 생성 실패';
-    console.error(err);
+  docxLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const original = docxLink.textContent;
+    docxLink.textContent = '📄 워드 생성 중…';
+    try {
+      const blob = await buildDocxBlob(a);
+      triggerDownload(blob, `exam_analysis_${safeName}.docx`);
+      docxLink.textContent = original;
+    } catch (err) {
+      docxLink.textContent = '⚠ 워드 생성 실패';
+      console.error(err);
+      setTimeout(() => docxLink.textContent = original, 2500);
+    }
   });
 
-  // PDF: 리포트 영역을 그대로 PDF 파일로 변환
   const pdfLink = document.getElementById('pdfLink');
-  pdfLink.addEventListener('click', (e) => {
-    if (!pdfLink.href || pdfLink.href.endsWith('#')) e.preventDefault();
-  });
-  buildPdfBlob(reportEl).then(blob => {
-    pdfLink.href = URL.createObjectURL(blob);
-    pdfLink.download = `exam_analysis_${safeName}.pdf`;
-    pdfLink.textContent = '📑 PDF 다운로드';
-  }).catch(err => {
-    pdfLink.textContent = '⚠ PDF 생성 실패';
-    console.error(err);
+  pdfLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const original = pdfLink.textContent;
+    pdfLink.textContent = '📑 PDF 생성 중…';
+    try {
+      const blob = await buildPdfBlob(reportEl);
+      triggerDownload(blob, `exam_analysis_${safeName}.pdf`);
+      pdfLink.textContent = original;
+    } catch (err) {
+      pdfLink.textContent = '⚠ PDF 생성 실패';
+      console.error(err);
+      setTimeout(() => pdfLink.textContent = original, 2500);
+    }
   });
 }
 
@@ -1183,14 +1551,26 @@ async function buildDocxBlob(a) {
     children: [run(`${info.school||''} ${info.grade||''} ${info.subject||''} 시험 분석`, { bold: true, size: 40, color: theme.navy })]
   });
   const subPara = new Paragraph({
-    spacing: { after: 300 },
+    spacing: { after: info.scope ? 60 : 300 },
     children: [run(`${info.exam_name||''}  |  ${info.date||''}  |  총 ${info.total_questions||'-'}문항 / ${info.total_points||'-'}점`, { color: theme.muted, size: 20 })]
   });
+  const scopePara = info.scope ? new Paragraph({
+    spacing: { after: 300 },
+    children: [run(`시험범위: ${info.scope}`, { color: theme.muted, size: 20 })]
+  }) : null;
 
   const sectionHeading = (text) => new Paragraph({
     spacing: { before: 200, after: 120 },
     children: [run(text, { bold: true, size: 26, color: theme.navy })]
   });
+
+  const diff = a.difficulty_summary || {};
+  const diffHeading = sectionHeading('난이도별 구성');
+  const diffRows = [
+    new TableRow({ children: [...DIFF_LEVELS, '최종난이도'].map(headerCell) }),
+    new TableRow({ children: [...DIFF_LEVELS.map(l => new TableCell({children:[cellPara(diff[l] ?? 0)]})), new TableCell({children:[cellPara(a.final_difficulty || '-')]})] })
+  ];
+  const diffTable = new Table({ rows: diffRows, width: { size: 100, type: WidthType.PERCENTAGE } });
 
   const unitHeading = sectionHeading('단원별 출제 비중');
   const unitRows = [
@@ -1214,19 +1594,29 @@ async function buildDocxBlob(a) {
   const typeTable = new Table({ rows: typeRows, width: { size: 100, type: WidthType.PERCENTAGE } });
 
   const itemHeading = sectionHeading('문항별 분석');
-  const itemHeader = new TableRow({ children: ['번호','단원','유형','배점','난이도','요약'].map(headerCell) });
+  const itemHeader = new TableRow({ children: ['번호','단원','유형','배점','난이도','요약','출처'].map(headerCell) });
   const itemRows = (a.items||[]).map(it => new TableRow({ children: [
     new TableCell({children:[cellPara(it.number)]}),
     new TableCell({children:[cellPara(it.unit)]}),
     new TableCell({children:[cellPara(it.type)]}),
     new TableCell({children:[cellPara(it.points)]}),
-    new TableCell({children:[cellPara(it.difficulty==='hard'?'고난도':it.difficulty==='mid'?'중간':'기본')]}),
-    new TableCell({children:[cellPara(it.summary)]})
+    new TableCell({children:[cellPara(it.difficulty || '')]}),
+    new TableCell({children:[cellPara(it.summary)]}),
+    new TableCell({children:[cellPara(it.source)]})
   ]}));
   const itemTable = new Table({ rows: [itemHeader, ...itemRows], width: { size: 100, type: WidthType.PERCENTAGE } });
 
   const insightHeading = sectionHeading('출제 경향 코멘트');
   const insightParas = (a.insights||[]).map(i => new Paragraph({ bullet: { level: 0 }, children: [run(i, { size: 22 })] }));
+
+  const prepSection = [];
+  if (a.prep_entries && a.prep_entries.length) {
+    prepSection.push(sectionHeading('이렇게 대비하였습니다'));
+    a.prep_entries.forEach(p => {
+      prepSection.push(new Paragraph({ spacing: { before: 120 }, children: [run(p.title || '', { bold: true, size: 24, color: theme.navy })] }));
+      prepSection.push(new Paragraph({ spacing: { after: 120 }, children: [run(p.content || '', { size: 22 })] }));
+    });
+  }
 
   const doc = new Document({
     styles: {
@@ -1236,14 +1626,17 @@ async function buildDocxBlob(a) {
     },
     sections: [{
       children: [
-        titlePara, subPara,
+        titlePara, subPara, ...(scopePara ? [scopePara] : []),
+        diffHeading, diffTable,
+        new Paragraph({ text: '' }),
         unitHeading, unitTable,
         new Paragraph({ text: '' }),
         typeHeading, typeTable,
         new Paragraph({ text: '' }),
         itemHeading, itemTable,
         new Paragraph({ text: '' }),
-        insightHeading, ...insightParas
+        insightHeading, ...insightParas,
+        ...prepSection
       ]
     }]
   });
@@ -1272,15 +1665,19 @@ async function buildPptxBlob(a) {
   s.addText(`${info.date||''}   ·   총 ${info.total_questions||'-'}문항 / ${info.total_points||'-'}점`, {
     x: 0.7, y: 4.2, w: 11.9, h: 0.5, fontFace: FONT, fontSize: 13, color: 'D8DEEA'
   });
+  if (info.scope) {
+    s.addText(`시험범위: ${info.scope}`, { x: 0.7, y: 4.7, w: 11.9, h: 0.5, fontFace: FONT, fontSize: 12, color: 'B9C3DA' });
+  }
 
   // 2) 핵심 지표
   s = pptx.addSlide();
   s.background = bgOpt;
   s.addText('핵심 지표', { x: 0.6, y: 0.4, w: 8, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy });
   const diff = a.difficulty_summary || {};
+  const hardishCount = (diff['상']||0) + (diff['최상']||0);
   const stats = [
     ['전체 문항 수', info.total_questions ?? '-'],
-    ['고난도 문항', diff.hard_count ?? '-'],
+    ['고난도(상·최상)', hardishCount],
     ['출제 단원 수', (a.unit_distribution||[]).length],
     ['총 배점', info.total_points ?? '-']
   ];
@@ -1292,6 +1689,22 @@ async function buildPptxBlob(a) {
     });
     s.addText(String(st[1]), { x, y: 1.45, w: 2.8, h: 0.8, align: 'center', fontFace: FONT, fontSize: 28, bold: true, color: theme.navy });
     s.addText(st[0], { x, y: 2.25, w: 2.8, h: 0.5, align: 'center', fontFace: FONT, fontSize: 12, color: theme.muted });
+  });
+
+  // 2-1) 난이도별 구성
+  s = pptx.addSlide();
+  s.background = bgOpt;
+  s.addText('난이도별 구성', { x: 0.6, y: 0.4, w: 8, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy });
+  const diffHeaderRow = [...DIFF_LEVELS, '최종난이도'].map(h => ({
+    text: h, options: { bold: true, color: 'FFFFFF', fill: { color: theme.navy }, fontFace: FONT, fontSize: 12, align: 'center' }
+  }));
+  const diffValueRow = [...DIFF_LEVELS.map(l => ({
+    text: String(diff[l] ?? 0), options: { fontFace: FONT, fontSize: 16, align: 'center' }
+  })), { text: a.final_difficulty || '-', options: { fontFace: FONT, fontSize: 16, align: 'center', bold: true, color: theme.coral } }];
+  s.addTable([diffHeaderRow, diffValueRow], {
+    x: 0.6, y: 2.2, w: 12.1, h: 1.4,
+    border: { type: 'solid', color: 'E3DDCF', pt: 0.5 },
+    fontFace: FONT
   });
 
   // 3) 단원별 출제 비중 (막대 차트)
@@ -1355,7 +1768,7 @@ async function buildPptxBlob(a) {
     s.addText(`문항별 분석${items.length > pageSize ? ` (${Math.floor(i/pageSize)+1}/${Math.ceil(items.length/pageSize)})` : ''}`, {
       x: 0.6, y: 0.4, w: 8, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy
     });
-    const headerRow = ['번호','단원','유형','배점','난이도','요약'].map(h => ({
+    const headerRow = ['번호','단원','유형','배점','난이도','요약','출처'].map(h => ({
       text: h, options: { bold: true, color: 'FFFFFF', fill: { color: theme.navy }, fontFace: FONT, fontSize: 10 }
     }));
     const rows = [headerRow, ...chunk.map(it => [
@@ -1363,12 +1776,13 @@ async function buildPptxBlob(a) {
       { text: String(it.unit||''), options: { fontFace: FONT, fontSize: 10 } },
       { text: String(it.type||''), options: { fontFace: FONT, fontSize: 10 } },
       { text: String(it.points??''), options: { fontFace: FONT, fontSize: 10 } },
-      { text: it.difficulty==='hard'?'고난도':it.difficulty==='mid'?'중간':'기본', options: { fontFace: FONT, fontSize: 10 } },
-      { text: String(it.summary||''), options: { fontFace: FONT, fontSize: 9 } }
+      { text: it.difficulty || '', options: { fontFace: FONT, fontSize: 10 } },
+      { text: String(it.summary||''), options: { fontFace: FONT, fontSize: 9 } },
+      { text: String(it.source||''), options: { fontFace: FONT, fontSize: 9 } }
     ])];
     s.addTable(rows, {
       x: 0.5, y: 1.2, w: 12.3,
-      colW: [0.7, 1.9, 1.7, 0.9, 1.0, 6.1],
+      colW: [0.6, 1.6, 1.4, 0.7, 0.8, 5.2, 2.0],
       border: { type: 'solid', color: 'E3DDCF', pt: 0.5 },
       autoPage: false,
       fontFace: FONT
@@ -1388,6 +1802,19 @@ async function buildPptxBlob(a) {
     });
   }
 
+  // 7) 이렇게 대비하였습니다
+  if (a.prep_entries && a.prep_entries.length) {
+    s = pptx.addSlide();
+    s.background = bgOpt;
+    s.addText('이렇게 대비하였습니다', { x: 0.6, y: 0.4, w: 11, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy });
+    const textRuns = [];
+    a.prep_entries.forEach((p, idx) => {
+      textRuns.push({ text: p.title || '', options: { bold: true, fontSize: 16, color: theme.coral, breakLine: true, paraSpaceAfter: 4 } });
+      textRuns.push({ text: p.content || '', options: { fontSize: 13, color: theme.ink || '201D1A', breakLine: idx < a.prep_entries.length - 1, paraSpaceAfter: 16 } });
+    });
+    s.addText(textRuns, { x: 0.7, y: 1.4, w: 11.9, h: 5.6, fontFace: FONT, valign: 'top' });
+  }
+
   return await pptx.write({ outputType: 'blob' });
 }
 
@@ -1395,6 +1822,17 @@ analyzeBtn.addEventListener('click', async () => {
   if (!selectedFile) return;
   if (supabaseClient && !currentUser) {
     openAuthModal('login');
+    return;
+  }
+  const examMeta = getExamMeta();
+  if (!examMeta.school || !examMeta.grade || !examMeta.examName || !examMeta.subject) {
+    showError('시험 정보(학교/학년/학기/과목)를 먼저 입력해주세요.');
+    examMetaPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  if (!examMeta.units.length) {
+    showError('시험범위에 해당하는 단원을 최소 1개 이상 선택해주세요.');
+    examMetaPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
   errorBox.innerHTML = '';
@@ -1407,7 +1845,7 @@ analyzeBtn.addEventListener('click', async () => {
   try {
     const images = await pdfToImages(selectedFile);
     stageText.textContent = 'Claude가 문항을 분석하는 중… (시간이 걸릴 수 있어요)';
-    const analysis = await analyzeWithClaude(images, toggleDetail.checked);
+    const analysis = await analyzeWithClaude(images, toggleDetail.checked, examMeta);
     lastAnalysis = analysis;
     stageBox.classList.remove('show');
     renderReport(analysis);
