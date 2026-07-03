@@ -6,10 +6,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Pretendard:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
+  :root, [data-theme="navy"]{
     --navy:#1B2A4A;
     --paper:#FAF6EF;
     --coral:#E8714A;
@@ -19,6 +20,36 @@
     --green:#4A7C59;
     --card:#FFFFFF;
   }
+  [data-theme="mono"]{
+    --navy:#111111;
+    --paper:#F5F5F3;
+    --coral:#111111;
+    --ink:#161616;
+    --muted:#8A8A85;
+    --line:#DEDEDA;
+    --green:#111111;
+    --card:#FFFFFF;
+  }
+  [data-theme="pastel"]{
+    --navy:#5B5A97;
+    --paper:#FBF7FC;
+    --coral:#F2A6B0;
+    --ink:#3A3450;
+    --muted:#9B93B0;
+    --line:#EADFF0;
+    --green:#7FB59E;
+    --card:#FFFFFF;
+  }
+  [data-theme="dark"]{
+    --navy:#EDEBE3;
+    --paper:#1C1C1E;
+    --coral:#F2994A;
+    --ink:#F2F0E8;
+    --muted:#9A968A;
+    --line:#3A3A3C;
+    --green:#6FCF97;
+    --card:#26262A;
+  }
   *{box-sizing:border-box;}
   body{
     margin:0;
@@ -26,6 +57,7 @@
     color:var(--ink);
     font-family:'Pretendard', sans-serif;
     line-height:1.5;
+    transition:background .2s, color .2s;
   }
   .wrap{max-width:1180px;margin:0 auto;padding:40px 28px 80px;}
 
@@ -91,6 +123,18 @@
   }
   .switch input:checked + .slider{background:var(--green);}
   .switch input:checked + .slider:before{transform:translateX(18px);}
+
+  .theme-row{margin-top:20px;padding-top:18px;border-top:1px solid var(--line);}
+  .theme-swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .theme-btn{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    background:var(--card);border:1.5px solid var(--line);border-radius:4px;
+    padding:10px 4px;font-family:'Pretendard',sans-serif;font-size:11px;color:var(--muted);
+    cursor:pointer;transition:border-color .15s,transform .1s;
+  }
+  .theme-btn:hover{border-color:var(--coral);}
+  .theme-btn.active{border-color:var(--navy);color:var(--ink);font-weight:700;box-shadow:0 0 0 1px var(--navy) inset;}
+  .swatch-dot{width:20px;height:20px;border-radius:50%;border:1px solid rgba(0,0,0,.08);}
 
   button.primary{
     width:100%;margin-top:22px;background:var(--navy);color:#fff;border:none;
@@ -235,6 +279,24 @@
         </label>
       </div>
 
+      <div class="theme-row">
+        <span class="label-main" style="font-size:13px;display:block;margin-bottom:10px;">리포트 디자인 테마</span>
+        <div class="theme-swatches" id="themeSwatches">
+          <button type="button" class="theme-btn active" data-theme="navy" title="네이비 저널">
+            <span class="swatch-dot" style="background:#1B2A4A;"></span>네이비
+          </button>
+          <button type="button" class="theme-btn" data-theme="mono" title="미니멀 모노">
+            <span class="swatch-dot" style="background:#111111;"></span>모노
+          </button>
+          <button type="button" class="theme-btn" data-theme="pastel" title="파스텔">
+            <span class="swatch-dot" style="background:#F2A6B0;"></span>파스텔
+          </button>
+          <button type="button" class="theme-btn" data-theme="dark" title="다크">
+            <span class="swatch-dot" style="background:#1C1C1E;"></span>다크
+          </button>
+        </div>
+      </div>
+
       <button class="primary" id="analyzeBtn" disabled>분석 시작</button>
 
       <p class="note">
@@ -280,6 +342,16 @@ const toggleDetail = document.getElementById('toggleDetail');
 
 let selectedFile = null;
 let lastAnalysis = null;
+let currentTheme = 'navy';
+
+const themeSwatches = document.getElementById('themeSwatches');
+themeSwatches.addEventListener('click', (e) => {
+  const btn = e.target.closest('.theme-btn');
+  if (!btn) return;
+  currentTheme = btn.dataset.theme;
+  document.documentElement.setAttribute('data-theme', currentTheme);
+  themeSwatches.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b === btn));
+});
 
 dropzone.addEventListener('click', () => fileInput.click());
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
@@ -507,10 +579,12 @@ function renderReport(a) {
     html += `</ul></div>`;
   }
 
-  html += `<div class="actions">
-    <a class="btn-outline" id="mdLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">📝 마크다운 다운로드</a>
-    <a class="btn-outline" id="docxLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">📄 워드(.docx) 다운로드</a>
-    <a class="btn-solid" id="pdfLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">📑 PDF 다운로드 준비 중…</a>
+  html += `<div class="actions" style="flex-wrap:wrap;">
+    <a class="btn-outline" id="manuscriptLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">✍️ 블로그 원고 다운로드</a>
+    <a class="btn-outline" id="mdLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">📝 마크다운 다운로드</a>
+    <a class="btn-outline" id="docxLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">📄 워드(.docx) 다운로드</a>
+    <a class="btn-outline" id="pptxLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">🖥️ PPT 다운로드 준비 중…</a>
+    <a class="btn-solid" id="pdfLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">📑 PDF 다운로드 준비 중…</a>
   </div>
   <p class="note" style="margin-top:14px;">ⓘ .docx 파일은 한글(HWP) 프로그램에서도 그대로 열어 편집할 수 있습니다. 버튼 클릭 후 다운로드가 시작되지 않으면, 버튼을 한 번 더 클릭해 파일 준비를 기다려주세요.</p>`;
 
@@ -537,6 +611,55 @@ function buildMarkdownString(a) {
   return md;
 }
 
+// 받침 유무에 따라 '은/는' 조사를 올바르게 선택 (한글이 아니면 '는' 기본값)
+function josaEunNeun(word) {
+  if (!word) return '는';
+  const last = word.trim().slice(-1);
+  const code = last.charCodeAt(0);
+  if (code < 0xAC00 || code > 0xD7A3) return '는';
+  return (code - 0xAC00) % 28 === 0 ? '는' : '은';
+}
+
+function buildManuscriptString(a) {
+  const info = a.exam_info || {};
+  const diff = a.difficulty_summary || {};
+  const units = a.unit_distribution || [];
+  const types = a.type_distribution || [];
+  const sortedUnits = [...units].sort((x,y) => (y.count||0) - (x.count||0));
+
+  const title = `${info.school||''} ${info.grade||''} ${info.subject||''} ${info.exam_name||'시험'} 분석`;
+
+  let unitPara = '';
+  if (sortedUnits.length) {
+    const top = sortedUnits.slice(0, 3).map(u => `${u.unit}(${u.count}문항)`).join(', ');
+    const examName = info.exam_name || '시험';
+    unitPara = `이번 ${examName}${josaEunNeun(examName)} 총 ${info.total_questions||'-'}문항, ${info.total_points||'-'}점 만점으로 출제되었습니다. 단원별로 살펴보면 ${top} 순으로 출제 비중이 높았으며, 전체 ${sortedUnits.length}개 단원에 걸쳐 고르게 문항이 구성되었습니다.`;
+  }
+
+  let typePara = '';
+  if (types.length) {
+    const typeList = types.map(t => `${t.type} ${t.count}문항`).join(', ');
+    typePara = `문항 유형은 ${typeList}으로 구성되어 있습니다.`;
+  }
+
+  let diffPara = '';
+  if (diff.easy_count != null || diff.mid_count != null || diff.hard_count != null) {
+    diffPara = `난이도 측면에서는 기본 문항 ${diff.easy_count ?? 0}개, 중간 난이도 문항 ${diff.mid_count ?? 0}개, 고난도 문항 ${diff.hard_count ?? 0}개로 나뉘며, 상위권 변별을 위한 고난도 문항의 비중을 함께 눈여겨볼 필요가 있습니다.`;
+  }
+
+  let body = `# ${title}\n\n`;
+  body += `${unitPara}\n\n`;
+  if (typePara) body += `${typePara} ${diffPara}\n\n`;
+
+  if (a.insights && a.insights.length) {
+    a.insights.forEach(i => { body += `${i}\n\n`; });
+  }
+
+  body += `이상으로 ${info.school||'이번'} ${info.exam_name||'시험'} 출제 경향 분석을 마칩니다. 다음 시험 대비 학습 방향이 궁금하신 학부모님과 학생분들은 언제든 편하게 문의해 주세요.\n`;
+
+  return body;
+}
+
 function wireUpActions(a) {
   const info = a.exam_info || {};
   const safeName = (info.school||'exam').replace(/[^a-zA-Z0-9가-힣]/g,'_');
@@ -546,6 +669,26 @@ function wireUpActions(a) {
   const mdLink = document.getElementById('mdLink');
   mdLink.href = URL.createObjectURL(mdBlob);
   mdLink.download = `exam_analysis_${safeName}.md`;
+
+  // 블로그 원고: 즉시 생성 가능
+  const manuscriptBlob = new Blob([buildManuscriptString(a)], {type: 'text/plain;charset=utf-8'});
+  const manuscriptLink = document.getElementById('manuscriptLink');
+  manuscriptLink.href = URL.createObjectURL(manuscriptBlob);
+  manuscriptLink.download = `blog_draft_${safeName}.txt`;
+
+  // pptx: 비동기 생성
+  const pptxLink = document.getElementById('pptxLink');
+  pptxLink.addEventListener('click', (e) => {
+    if (!pptxLink.href || pptxLink.href.endsWith('#')) e.preventDefault();
+  });
+  buildPptxBlob(a).then(blob => {
+    pptxLink.href = URL.createObjectURL(blob);
+    pptxLink.download = `exam_analysis_${safeName}.pptx`;
+    pptxLink.textContent = '🖥️ PPT 다운로드';
+  }).catch(err => {
+    pptxLink.textContent = '⚠ PPT 생성 실패';
+    console.error(err);
+  });
 
   // docx: 비동기 생성, 준비되면 href 연결. 그 전에 클릭하면 안내.
   const docxLink = document.getElementById('docxLink');
@@ -607,64 +750,91 @@ async function buildPdfBlob(reportNode) {
   }
 }
 
+function getThemeHexColors() {
+  const cs = getComputedStyle(document.documentElement);
+  const clean = (v) => (v || '').trim().replace('#', '').toUpperCase() || '1B2A4A';
+  return {
+    navy: clean(cs.getPropertyValue('--navy')),
+    coral: clean(cs.getPropertyValue('--coral')),
+    muted: clean(cs.getPropertyValue('--muted')),
+    line: clean(cs.getPropertyValue('--line')),
+    ink: clean(cs.getPropertyValue('--ink')),
+    green: clean(cs.getPropertyValue('--green'))
+  };
+}
+
+// 워드에서 한글이 안정적으로 렌더링되도록 모든 런에 동일한 한/영 폰트를 명시.
+// '맑은 고딕'은 Windows/한글 기본 내장 폰트라 사용자 PC에 별도 설치 없이 그대로 보임.
 async function buildDocxBlob(a) {
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, WidthType } = docx;
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, WidthType, AlignmentType } = docx;
   const info = a.exam_info || {};
+  const theme = getThemeHexColors();
+
+  const run = (text, opts) => new TextRun(Object.assign({ text, font: '맑은 고딕' }, opts || {}));
+  const cellPara = (text, opts) => new Paragraph({ children: [run(String(text ?? ''), opts)] });
+  const headerCell = (text) => new TableCell({
+    shading: { fill: theme.navy },
+    children: [new Paragraph({ children: [run(text, { bold: true, color: 'FFFFFF', size: 20 })] })]
+  });
 
   const titlePara = new Paragraph({
-    heading: HeadingLevel.HEADING_1,
-    children: [new TextRun(`${info.school||''} ${info.grade||''} ${info.subject||''} 시험 분석`)]
+    children: [run(`${info.school||''} ${info.grade||''} ${info.subject||''} 시험 분석`, { bold: true, size: 40, color: theme.navy })]
   });
   const subPara = new Paragraph({
-    children: [new TextRun({
-      text: `${info.exam_name||''}  |  ${info.date||''}  |  총 ${info.total_questions||'-'}문항 / ${info.total_points||'-'}점`,
-      color: '8B8779', size: 20
-    })]
+    spacing: { after: 300 },
+    children: [run(`${info.exam_name||''}  |  ${info.date||''}  |  총 ${info.total_questions||'-'}문항 / ${info.total_points||'-'}점`, { color: theme.muted, size: 20 })]
   });
 
-  const unitHeading = new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('단원별 출제 비중')] });
+  const sectionHeading = (text) => new Paragraph({
+    spacing: { before: 200, after: 120 },
+    children: [run(text, { bold: true, size: 26, color: theme.navy })]
+  });
+
+  const unitHeading = sectionHeading('단원별 출제 비중');
   const unitRows = [
-    new TableRow({ children: ['단원','문항수','배점'].map(h => new TableCell({ children:[new Paragraph({children:[new TextRun({text:h,bold:true})]})] })) }),
+    new TableRow({ children: ['단원','문항수','배점'].map(headerCell) }),
     ...(a.unit_distribution||[]).map(u => new TableRow({ children: [
-      new TableCell({children:[new Paragraph(String(u.unit||''))]}),
-      new TableCell({children:[new Paragraph(String(u.count??''))]}),
-      new TableCell({children:[new Paragraph(String(u.points??''))]})
+      new TableCell({children:[cellPara(u.unit)]}),
+      new TableCell({children:[cellPara(u.count)]}),
+      new TableCell({children:[cellPara(u.points)]})
     ]}))
   ];
   const unitTable = new Table({ rows: unitRows, width: { size: 100, type: WidthType.PERCENTAGE } });
 
-  const typeHeading = new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('유형 분포')] });
+  const typeHeading = sectionHeading('유형 분포');
   const typeRows = [
-    new TableRow({ children: ['유형','문항수'].map(h => new TableCell({ children:[new Paragraph({children:[new TextRun({text:h,bold:true})]})] })) }),
+    new TableRow({ children: ['유형','문항수'].map(headerCell) }),
     ...(a.type_distribution||[]).map(t => new TableRow({ children: [
-      new TableCell({children:[new Paragraph(String(t.type||''))]}),
-      new TableCell({children:[new Paragraph(String(t.count??''))]})
+      new TableCell({children:[cellPara(t.type)]}),
+      new TableCell({children:[cellPara(t.count)]})
     ]}))
   ];
   const typeTable = new Table({ rows: typeRows, width: { size: 100, type: WidthType.PERCENTAGE } });
 
-  const itemHeading = new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('문항별 분석')] });
-  const itemHeader = new TableRow({ children: ['번호','단원','유형','배점','난이도','요약'].map(h =>
-    new TableCell({ children:[new Paragraph({children:[new TextRun({text:h,bold:true})]})] })
-  )});
+  const itemHeading = sectionHeading('문항별 분석');
+  const itemHeader = new TableRow({ children: ['번호','단원','유형','배점','난이도','요약'].map(headerCell) });
   const itemRows = (a.items||[]).map(it => new TableRow({ children: [
-    new TableCell({children:[new Paragraph(String(it.number??''))]}),
-    new TableCell({children:[new Paragraph(String(it.unit||''))]}),
-    new TableCell({children:[new Paragraph(String(it.type||''))]}),
-    new TableCell({children:[new Paragraph(String(it.points??''))]}),
-    new TableCell({children:[new Paragraph(String(it.difficulty||''))]}),
-    new TableCell({children:[new Paragraph(String(it.summary||''))]})
+    new TableCell({children:[cellPara(it.number)]}),
+    new TableCell({children:[cellPara(it.unit)]}),
+    new TableCell({children:[cellPara(it.type)]}),
+    new TableCell({children:[cellPara(it.points)]}),
+    new TableCell({children:[cellPara(it.difficulty==='hard'?'고난도':it.difficulty==='mid'?'중간':'기본')]}),
+    new TableCell({children:[cellPara(it.summary)]})
   ]}));
   const itemTable = new Table({ rows: [itemHeader, ...itemRows], width: { size: 100, type: WidthType.PERCENTAGE } });
 
-  const insightHeading = new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun('출제 경향 코멘트')] });
-  const insightParas = (a.insights||[]).map(i => new Paragraph({ bullet: { level: 0 }, children: [new TextRun(i)] }));
+  const insightHeading = sectionHeading('출제 경향 코멘트');
+  const insightParas = (a.insights||[]).map(i => new Paragraph({ bullet: { level: 0 }, children: [run(i, { size: 22 })] }));
 
   const doc = new Document({
+    styles: {
+      default: {
+        document: { run: { font: '맑은 고딕', size: 22 } }
+      }
+    },
     sections: [{
       children: [
         titlePara, subPara,
-        new Paragraph({ text: '' }),
         unitHeading, unitTable,
         new Paragraph({ text: '' }),
         typeHeading, typeTable,
@@ -677,6 +847,146 @@ async function buildDocxBlob(a) {
   });
 
   return await Packer.toBlob(doc);
+}
+
+async function buildPptxBlob(a) {
+  const info = a.exam_info || {};
+  const theme = getThemeHexColors();
+  const pptx = new PptxGenJS();
+  pptx.layout = 'LAYOUT_WIDE'; // 13.33 x 7.5 in
+  const FONT = '맑은 고딕';
+
+  const bgOpt = { color: theme.line ? 'FFFFFF' : 'FFFFFF' };
+
+  // 1) 표지
+  let s = pptx.addSlide();
+  s.background = { color: theme.navy };
+  s.addText(`${info.school||''} ${info.grade||''} ${info.subject||''}`, {
+    x: 0.7, y: 2.5, w: 11.9, h: 1.2, fontFace: FONT, fontSize: 32, bold: true, color: 'FFFFFF'
+  });
+  s.addText(`${info.exam_name||'시험 분석 리포트'}`, {
+    x: 0.7, y: 3.5, w: 11.9, h: 0.7, fontFace: FONT, fontSize: 18, color: theme.coral
+  });
+  s.addText(`${info.date||''}   ·   총 ${info.total_questions||'-'}문항 / ${info.total_points||'-'}점`, {
+    x: 0.7, y: 4.2, w: 11.9, h: 0.5, fontFace: FONT, fontSize: 13, color: 'D8DEEA'
+  });
+
+  // 2) 핵심 지표
+  s = pptx.addSlide();
+  s.background = bgOpt;
+  s.addText('핵심 지표', { x: 0.6, y: 0.4, w: 8, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy });
+  const diff = a.difficulty_summary || {};
+  const stats = [
+    ['전체 문항 수', info.total_questions ?? '-'],
+    ['고난도 문항', diff.hard_count ?? '-'],
+    ['출제 단원 수', (a.unit_distribution||[]).length],
+    ['총 배점', info.total_points ?? '-']
+  ];
+  stats.forEach((st, i) => {
+    const x = 0.6 + i * 3.1;
+    s.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
+      x, y: 1.3, w: 2.8, h: 1.6, fill: { color: 'F5F3EC' }, line: { color: theme.line, width: 1 }, rectRadius: 0.06,
+      shadow: { type: 'outer', color: '000000', blur: 6, offset: 2, angle: 45, opacity: 0.1 }
+    });
+    s.addText(String(st[1]), { x, y: 1.45, w: 2.8, h: 0.8, align: 'center', fontFace: FONT, fontSize: 28, bold: true, color: theme.navy });
+    s.addText(st[0], { x, y: 2.25, w: 2.8, h: 0.5, align: 'center', fontFace: FONT, fontSize: 12, color: theme.muted });
+  });
+
+  // 3) 단원별 출제 비중 (막대 차트)
+  const units = a.unit_distribution || [];
+  if (units.length) {
+    s = pptx.addSlide();
+    s.background = bgOpt;
+    s.addText('단원별 출제 비중', { x: 0.6, y: 0.4, w: 8, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy });
+    s.addChart(pptx.charts.BAR, [{
+      name: '문항수',
+      labels: units.map(u => u.unit),
+      values: units.map(u => u.count)
+    }], {
+      x: 0.6, y: 1.2, w: 12.1, h: 5.8,
+      barDir: 'bar',
+      chartColors: [theme.navy],
+      chartArea: { fill: { color: 'FFFFFF' } },
+      catGridLine: { style: 'none' },
+      valGridLine: { color: theme.line, size: 0.5 },
+      showValue: true,
+      dataLabelPosition: 'outEnd',
+      dataLabelColor: theme.ink || '201D1A',
+      dataLabelFontFace: FONT,
+      catAxisLabelFontFace: FONT,
+      catAxisLabelColor: theme.muted,
+      valAxisLabelFontFace: FONT,
+      valAxisLabelColor: theme.muted,
+      catAxisLabelFontSize: 11,
+      showLegend: false
+    });
+  }
+
+  // 4) 유형 분포
+  const types = a.type_distribution || [];
+  if (types.length) {
+    s = pptx.addSlide();
+    s.background = bgOpt;
+    s.addText('유형 분포', { x: 0.6, y: 0.4, w: 8, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy });
+    s.addChart(pptx.charts.DOUGHNUT, [{
+      name: '유형',
+      labels: types.map(t => t.type),
+      values: types.map(t => t.count)
+    }], {
+      x: 2.5, y: 1.2, w: 8, h: 5.8,
+      chartColors: [theme.navy, theme.coral, theme.green || '4A7C59', theme.muted, '8B8779', 'B9C3DA'],
+      showLegend: true,
+      legendPos: 'r',
+      legendFontFace: FONT,
+      dataLabelFontFace: FONT,
+      showPercent: true
+    });
+  }
+
+  // 5) 문항별 분석 표 (10행씩 페이지 분할)
+  const items = a.items || [];
+  const pageSize = 12;
+  for (let i = 0; i < items.length; i += pageSize) {
+    const chunk = items.slice(i, i + pageSize);
+    s = pptx.addSlide();
+    s.background = bgOpt;
+    s.addText(`문항별 분석${items.length > pageSize ? ` (${Math.floor(i/pageSize)+1}/${Math.ceil(items.length/pageSize)})` : ''}`, {
+      x: 0.6, y: 0.4, w: 8, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy
+    });
+    const headerRow = ['번호','단원','유형','배점','난이도','요약'].map(h => ({
+      text: h, options: { bold: true, color: 'FFFFFF', fill: { color: theme.navy }, fontFace: FONT, fontSize: 10 }
+    }));
+    const rows = [headerRow, ...chunk.map(it => [
+      { text: String(it.number??''), options: { fontFace: FONT, fontSize: 10 } },
+      { text: String(it.unit||''), options: { fontFace: FONT, fontSize: 10 } },
+      { text: String(it.type||''), options: { fontFace: FONT, fontSize: 10 } },
+      { text: String(it.points??''), options: { fontFace: FONT, fontSize: 10 } },
+      { text: it.difficulty==='hard'?'고난도':it.difficulty==='mid'?'중간':'기본', options: { fontFace: FONT, fontSize: 10 } },
+      { text: String(it.summary||''), options: { fontFace: FONT, fontSize: 9 } }
+    ])];
+    s.addTable(rows, {
+      x: 0.5, y: 1.2, w: 12.3,
+      colW: [0.7, 1.9, 1.7, 0.9, 1.0, 6.1],
+      border: { type: 'solid', color: 'E3DDCF', pt: 0.5 },
+      autoPage: false,
+      fontFace: FONT
+    });
+  }
+
+  // 6) 출제 경향 코멘트
+  if (a.insights && a.insights.length) {
+    s = pptx.addSlide();
+    s.background = { color: theme.navy };
+    s.addText('출제 경향 코멘트', { x: 0.6, y: 0.4, w: 11, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: 'FFFFFF' });
+    s.addText(a.insights.map((i, idx) => ({
+      text: i,
+      options: { bullet: true, breakLine: idx < a.insights.length - 1, paraSpaceAfter: 12 }
+    })), {
+      x: 0.7, y: 1.4, w: 11.9, h: 5.6, fontFace: FONT, fontSize: 15, color: 'EDEBE3', valign: 'top'
+    });
+  }
+
+  return await pptx.write({ outputType: 'blob' });
 }
 
 analyzeBtn.addEventListener('click', async () => {
