@@ -1337,7 +1337,12 @@ ${mockSearchInstructions}
   "insights": [
     "학교명, 학년, 과목, 고사명을 언급하며 시작하는 출제 경향 총평. 단원별 출제 비중과 특징, 주요 출제 포인트, 전반부/후반부 구성 특징, 전체 난이도 총평까지 포함한 4~6문장 분량의 풍부한 분석. 학원 블로그에 바로 올릴 수 있는 전문적인 톤으로 작성. 저작권 문제 없는 일반적 분석만 포함."
   ]
-}`;
+}
+
+최종 출력 형식 규칙 (절대 어기지 마):
+- 웹검색을 사용했더라도, 검색 과정이나 중간 설명, 마크다운 목록(-, *, **) 등은 절대 최종 응답에 포함하지 마.
+- 최종 응답은 반드시 위 스키마를 따르는 JSON 객체 "단 하나"여야 해. JSON 앞뒤로 어떤 설명 문장도, 코드블록 표시(\`\`\`)도 붙이지 마.
+- 응답은 반드시 { 로 시작해서 } 로 끝나야 해.`;
 
   let response;
   try {
@@ -1376,17 +1381,46 @@ ${mockSearchInstructions}
   }
 
   const text = data.content.map(b => b.text || '').join('\n');
-  const firstBrace = text.indexOf('{');
-  const lastBrace = text.lastIndexOf('}');
-  if (firstBrace === -1 || lastBrace === -1) {
-    throw new Error('응답에서 JSON 형식을 찾을 수 없습니다. 원본 응답: ' + text.slice(0, 300));
+
+  // 안전한 JSON 추출: 텍스트 안에 수식 등으로 인해 { }가 여러 번 등장할 수 있으므로,
+  // 단순히 첫 '{'~마지막 '}' 를 자르지 않고, 실제로 유효한 JSON으로 파싱되는 블록을 괄호 깊이 계산으로 찾는다.
+  function extractValidJson(str) {
+    const candidates = [];
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] !== '{') continue;
+      let depth = 0;
+      for (let j = i; j < str.length; j++) {
+        if (str[j] === '{') depth++;
+        else if (str[j] === '}') {
+          depth--;
+          if (depth === 0) {
+            candidates.push(str.slice(i, j + 1));
+            break;
+          }
+        }
+      }
+    }
+    // exam_info 키를 포함하는 가장 긴 후보를 우선 시도 (실제 결과 JSON일 가능성이 가장 높음)
+    candidates.sort((a, b) => b.length - a.length);
+    for (const c of candidates) {
+      if (!c.includes('"exam_info"') && !c.includes('"items"')) continue;
+      try { return JSON.parse(c); } catch (e) { /* try next candidate */ }
+    }
+    // 위에서 못 찾았으면 아무 후보나 파싱 시도
+    for (const c of candidates) {
+      try { return JSON.parse(c); } catch (e) { /* try next */ }
+    }
+    return null;
   }
-  const clean = text.slice(firstBrace, lastBrace + 1);
-  let parsed;
-  try {
-    parsed = JSON.parse(clean);
-  } catch (e) {
-    throw new Error('JSON 파싱 실패: ' + e.message + ' / 원본 일부: ' + clean.slice(0,300));
+
+  let parsed = extractValidJson(text);
+  if (!parsed) {
+    if (attempt < 3) {
+      // 모델이 형식을 안 지켰을 때, 자동으로 한 번 더 시도 (일시적 실수일 가능성이 높음)
+      await new Promise(r => setTimeout(r, 800));
+      return analyzeWithClaude(images, includeDetail, examMeta, useMockSearch, attempt + 1);
+    }
+    throw new Error('AI 응답에서 올바른 JSON 형식을 찾지 못했습니다 (여러 번 재시도했지만 실패). 페이지 수를 줄이거나 잠시 후 다시 시도해 주세요. 원본 일부: ' + text.slice(0, 200));
   }
 
   // 선생님이 입력한 시험 정보를 신뢰의 원천(source of truth)으로 사용 — AI가 OCR로 잘못 읽을 여지를 제거
