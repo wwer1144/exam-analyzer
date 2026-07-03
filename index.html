@@ -1828,17 +1828,18 @@ async function buildDocxBlob(a) {
 }
 
 // 웹 리포트의 <span class="tag"> 스타일(코랄 배경 소형 라벨 + 제목)을 PPT에서 재현
-function addSectionTag(slide, pptxInst, tagText, title, theme, FONT) {
+function addSectionTag(slide, pptxInst, tagText, title, theme, FONT, y) {
+  y = y === undefined ? 0.42 : y;
   const tagW = 0.45 + tagText.length * 0.11;
   slide.addShape(pptxInst.shapes.RECTANGLE, {
-    x: 0.6, y: 0.42, w: tagW, h: 0.28, fill: { color: theme.coral }, line: { type: 'none' }
+    x: 0.6, y, w: tagW, h: 0.28, fill: { color: theme.coral }, line: { type: 'none' }
   });
   slide.addText(tagText, {
-    x: 0.6, y: 0.42, w: tagW, h: 0.28, align: 'center', valign: 'middle',
+    x: 0.6, y, w: tagW, h: 0.28, align: 'center', valign: 'middle',
     fontFace: 'Consolas', fontSize: 9, bold: true, color: 'FFFFFF'
   });
   slide.addText(title, {
-    x: 0.6 + tagW + 0.15, y: 0.35, w: 9, h: 0.45, fontFace: FONT, fontSize: 20, bold: true, color: theme.navy, valign: 'middle'
+    x: 0.6 + tagW + 0.15, y: y - 0.07, w: 9, h: 0.42, fontFace: FONT, fontSize: 17, bold: true, color: theme.navy, valign: 'middle'
   });
 }
 
@@ -1853,7 +1854,7 @@ async function buildPptxBlob(a) {
   const diff = a.difficulty_summary || {};
   const hardishCount = (diff['상']||0) + (diff['최상']||0);
 
-  // 1) 표지 + 핵심 지표 (웹 리포트 상단부와 동일한 레이아웃)
+  // 1) 표지 — 제목/부제/배지만 (통계는 다음 페이지로)
   let s = pptx.addSlide();
   s.background = bgOpt;
   s.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
@@ -1876,51 +1877,85 @@ async function buildPptxBlob(a) {
     s.addText(`시험범위: ${info.scope}`, { x: 0.6, y: 2.05, w: 12.1, h: 0.35, fontFace: FONT, fontSize: 11.5, color: theme.muted, italic: true });
   }
 
-  const statsY = info.scope ? 2.55 : 2.15;
+  // 2) 핵심 요약 — 통계 카드 + 난이도표 + 단원별 비중 + 유형 분포를 한 슬라이드에 (웹 리포트 상단 구성과 동일)
+  const units = a.unit_distribution || [];
+  const types = a.type_distribution || [];
+
+  s = pptx.addSlide();
+  s.background = bgOpt;
+
   const stats = [
     ['전체 문항 수', info.total_questions ?? '-'],
     ['고난도(상·최상)', hardishCount],
-    ['출제 단원 수', (a.unit_distribution||[]).length],
+    ['출제 단원 수', units.length],
     ['총 배점', info.total_points ?? '-']
   ];
   stats.forEach((st, i) => {
     const x = 0.6 + i * 3.08;
     s.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
-      x, y: statsY, w: 2.85, h: 1.55, fill: { color: 'F5F3EC' }, line: { color: theme.line, width: 1 }, rectRadius: 0.05
+      x, y: 0.35, w: 2.85, h: 1.05, fill: { color: 'F5F3EC' }, line: { color: theme.line, width: 1 }, rectRadius: 0.05
     });
-    s.addText(String(st[1]), { x, y: statsY+0.15, w: 2.85, h: 0.8, align: 'center', fontFace: FONT, fontSize: 27, bold: true, color: theme.navy });
-    s.addText(st[0], { x, y: statsY+0.95, w: 2.85, h: 0.5, align: 'center', fontFace: FONT, fontSize: 11.5, color: theme.muted });
+    s.addText(String(st[1]), { x, y: 0.42, w: 2.85, h: 0.55, align: 'center', fontFace: FONT, fontSize: 21, bold: true, color: theme.navy });
+    s.addText(st[0], { x, y: 0.95, w: 2.85, h: 0.4, align: 'center', fontFace: FONT, fontSize: 10, color: theme.muted });
   });
 
-  // 2) 난이도별 구성
-  s = pptx.addSlide();
-  s.background = bgOpt;
-  addSectionTag(s, pptx, 'LEVEL', '난이도별 구성', theme, FONT);
+  addSectionTag(s, pptx, 'LEVEL', '난이도별 구성', theme, FONT, 1.65);
   const diffHeaderRow = [...DIFF_LEVELS, '최종난이도'].map(h => ({
-    text: h, options: { bold: true, color: 'FFFFFF', fill: { color: theme.navy }, fontFace: FONT, fontSize: 12, align: 'center' }
+    text: h, options: { bold: true, color: 'FFFFFF', fill: { color: theme.navy }, fontFace: FONT, fontSize: 10.5, align: 'center' }
   }));
   const diffValueRow = [...DIFF_LEVELS.map(l => ({
-    text: String(diff[l] ?? 0), options: { fontFace: FONT, fontSize: 16, align: 'center' }
-  })), { text: a.final_difficulty || '-', options: { fontFace: FONT, fontSize: 16, align: 'center', bold: true, color: theme.coral } }];
+    text: String(diff[l] ?? 0), options: { fontFace: FONT, fontSize: 13, align: 'center' }
+  })), { text: a.final_difficulty || '-', options: { fontFace: FONT, fontSize: 13, align: 'center', bold: true, color: theme.coral } }];
   s.addTable([diffHeaderRow, diffValueRow], {
-    x: 0.6, y: 1.5, w: 12.1, h: 1.4,
+    x: 0.6, y: 1.95, w: 12.1, h: 0.85,
     border: { type: 'solid', color: 'E3DDCF', pt: 0.5 },
     fontFace: FONT
   });
 
-  // 3) 단원별 출제 비중 — 웹 리포트와 동일하게 막대를 직접 그려서 표현 (네이티브 차트 대신)
-  const units = a.unit_distribution || [];
-  if (units.length) {
-    const maxUnitCount = Math.max(...units.map(u => u.count || 0), 1);
+  const chartTagY = 3.05;
+  addSectionTag(s, pptx, 'CHART', '단원별 출제 비중', theme, FONT, chartTagY);
+  const chartAreaTop = chartTagY + 0.45;
+  const chartAreaBottom = types.length ? 6.35 : 7.0;
+  const maxUnitCount = Math.max(...units.map(u => u.count || 0), 1);
+  const compactRowH = units.length ? Math.max(Math.min((chartAreaBottom - chartAreaTop) / units.length, 0.62), 0.32) : 0.5;
+  const visibleUnits = compactRowH <= 0.32 ? Math.floor((chartAreaBottom - chartAreaTop) / 0.32) : units.length;
+  const trackX = 3.7, trackW = 7.1;
+  units.slice(0, visibleUnits).forEach((u, idx) => {
+    const rowY = chartAreaTop + idx * compactRowH;
+    const barH = Math.min(compactRowH * 0.55, 0.32);
+    s.addText(u.unit, { x: 0.6, y: rowY, w: 3.0, h: compactRowH, fontFace: FONT, fontSize: 11.5, color: theme.ink, valign: 'middle' });
+    s.addShape(pptx.shapes.ROUNDED_RECTANGLE, { x: trackX, y: rowY + (compactRowH-barH)/2, w: trackW, h: barH, fill: { color: 'ECE7D8' }, line: { type: 'none' }, rectRadius: 0.4 });
+    const fillW = Math.max(trackW * ((u.count||0) / maxUnitCount), 0.12);
+    s.addShape(pptx.shapes.ROUNDED_RECTANGLE, { x: trackX, y: rowY + (compactRowH-barH)/2, w: fillW, h: barH, fill: { color: theme.navy }, line: { type: 'none' }, rectRadius: 0.4 });
+    s.addText(`${u.count}문항 · ${u.points ?? '-'}점`, { x: trackX + trackW + 0.15, y: rowY, w: 1.9, h: compactRowH, fontFace: FONT, fontSize: 10, color: theme.muted, valign: 'middle' });
+  });
+
+  if (types.length) {
+    addSectionTag(s, pptx, 'TYPE', '유형 분포', theme, FONT, chartAreaBottom + 0.15);
+    let px = 0.6, py = chartAreaBottom + 0.6;
+    const maxX = 12.7;
+    types.forEach(t => {
+      const label = `${t.type} · ${t.count}문항`;
+      const pillW = Math.min(Math.max(label.length * 0.12 + 0.4, 1.4), 5);
+      if (px + pillW > maxX) { px = 0.6; py += 0.45; }
+      s.addShape(pptx.shapes.ROUNDED_RECTANGLE, { x: px, y: py, w: pillW, h: 0.38, fill: { color: 'EDE7D6' }, line: { type: 'none' }, rectRadius: 0.4 });
+      s.addText(label, { x: px, y: py, w: pillW, h: 0.38, align: 'center', valign: 'middle', fontFace: FONT, fontSize: 10.5, color: theme.ink || '201D1A' });
+      px += pillW + 0.15;
+    });
+  }
+
+  // 2-1) 단원이 너무 많아 한 슬라이드에 못 담을 경우, 나머지를 이어서 표시
+  if (units.length > visibleUnits) {
+    const remaining = units.slice(visibleUnits);
     const rowsPerSlide = 6;
-    for (let i = 0; i < units.length; i += rowsPerSlide) {
-      const chunk = units.slice(i, i + rowsPerSlide);
+    for (let i = 0; i < remaining.length; i += rowsPerSlide) {
+      const chunk = remaining.slice(i, i + rowsPerSlide);
       s = pptx.addSlide();
       s.background = bgOpt;
-      addSectionTag(s, pptx, 'CHART', '단원별 출제 비중', theme, FONT);
-      const trackX = 3.7, trackW = 7.1, rowH = 0.95;
+      addSectionTag(s, pptx, 'CHART', '단원별 출제 비중 (계속)', theme, FONT, 0.42);
+      const rowH2 = 0.95, top2 = 1.5;
       chunk.forEach((u, idx) => {
-        const rowY = 1.5 + idx * rowH;
+        const rowY = top2 + idx * rowH2;
         s.addText(u.unit, { x: 0.6, y: rowY, w: 3.0, h: 0.5, fontFace: FONT, fontSize: 13, color: theme.ink, valign: 'middle' });
         s.addShape(pptx.shapes.ROUNDED_RECTANGLE, { x: trackX, y: rowY+0.1, w: trackW, h: 0.32, fill: { color: 'ECE7D8' }, line: { type: 'none' }, rectRadius: 0.4 });
         const fillW = Math.max(trackW * ((u.count||0) / maxUnitCount), 0.15);
@@ -1930,25 +1965,7 @@ async function buildPptxBlob(a) {
     }
   }
 
-  // 4) 유형 분포 — 알약(pill) 태그 형태로 표현 (웹 리포트와 동일)
-  const types = a.type_distribution || [];
-  if (types.length) {
-    s = pptx.addSlide();
-    s.background = bgOpt;
-    addSectionTag(s, pptx, 'TYPE', '유형 분포', theme, FONT);
-    let px = 0.6, py = 1.5;
-    const maxX = 12.7;
-    types.forEach(t => {
-      const label = `${t.type} · ${t.count}문항`;
-      const pillW = Math.min(Math.max(label.length * 0.135 + 0.5, 1.6), 6);
-      if (px + pillW > maxX) { px = 0.6; py += 0.65; }
-      s.addShape(pptx.shapes.ROUNDED_RECTANGLE, { x: px, y: py, w: pillW, h: 0.5, fill: { color: 'EDE7D6' }, line: { type: 'none' }, rectRadius: 0.5 });
-      s.addText(label, { x: px, y: py, w: pillW, h: 0.5, align: 'center', valign: 'middle', fontFace: FONT, fontSize: 12, color: theme.ink || '201D1A' });
-      px += pillW + 0.2;
-    });
-  }
-
-  // 5) 문항별 분석 표 (10행씩 페이지 분할)
+  // 3) 문항별 분석 표 (10행씩 페이지 분할)
   const items = a.items || [];
   const pageSize = 12;
   for (let i = 0; i < items.length; i += pageSize) {
