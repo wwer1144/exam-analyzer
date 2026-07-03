@@ -1225,13 +1225,15 @@ async function pdfToImages(file) {
   for (let i = 1; i <= maxPages; i++) {
     stageText.textContent = `페이지 변환 중… (${i}/${maxPages})`;
     const page = await pdf.getPage(i);
-    const viewport = page.getViewport({scale: 0.8});
+    // 배점 표기([5.8점] 같은 소형 괄호 글씨)를 정확히 읽으려면 해상도가 충분히 높아야 함.
+    // scale 2.0 + JPEG 85%로, 원문 배점을 흐릿하게 오독하는 문제를 줄임.
+    const viewport = page.getViewport({scale: 2.0});
     const canvas = document.createElement('canvas');
     canvas.width = viewport.width;
     canvas.height = viewport.height;
     const ctx = canvas.getContext('2d');
     await page.render({canvasContext: ctx, viewport}).promise;
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
     images.push(dataUrl.split(',')[1]);
   }
   return images;
@@ -1274,6 +1276,11 @@ ${unitListText}
 - 대신 각 문항이 어떤 단원/개념을 다루는지, 어떤 유형(계산/응용/복합/도형/서술형 등)인지, 난이도가 어느 정도인지를 너의 표현으로 요약해.
 - 손글씨로 채점/풀이 흔적이 있다면 무시하고 인쇄된 문제만 분석해.
 - 위에서 제공한 단원 목록이 있다면 반드시 그 목록 안에서만 단원을 분류해. 목록이 없을 때만 네가 판단해서 교과서 "대단원" 수준으로 묶어줘 (소단원으로 잘게 쪼개지 마).
+
+배점 인식 규칙 (매우 중요):
+- 각 문항의 배점은 보통 문항 번호 옆이나 문제 끝에 대괄호/괄호로 표시돼 (예: "[5.8점]", "(4점)"). 이 표기를 최우선으로, 글자 하나하나 정확히 읽어. 소수점이 있으면 절대 정수로 반올림하거나 착각하지 마 (예: "5.8점"을 "6점"으로 잘못 읽지 마).
+- 배점 숫자가 흐릿하거나 확신이 안 서면, 주변 문항들의 배점 패턴과 시험지 앞부분에 있는 "배점표"(있다면)를 참고해서 다시 한번 확인해.
+- 모든 문항의 items[].points를 다 채운 뒤, 그 합계가 exam_info.total_points(시험지에 표시된 총점, 보통 100점)와 일치하는지 스스로 검산해. 만약 안 맞으면 어느 문항의 배점을 잘못 읽었는지 이미지를 다시 확인해서 수정해.
 
 서술형/서답형 문항 인식 (중요):
 - 시험지 뒷부분이나 별도 페이지에 답을 직접 쓰는 줄/네모 칸이 있는 문항(객관식 선택지 ①~⑤가 없는 문항)은 서술형/서답형 문항이야. 반드시 놓치지 말고 전부 분석에 포함해.
