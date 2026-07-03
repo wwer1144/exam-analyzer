@@ -5,7 +5,8 @@
 <title>시험분석기 — 프로토타입</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1736,22 +1737,56 @@ async function buildPdfBlob(reportNode) {
   const noteP = clone.querySelector('p.note');
   if (noteP && noteP.parentElement === clone) noteP.remove();
 
+  const cs = getComputedStyle(document.documentElement);
+  const paperColor = (cs.getPropertyValue('--paper') || '#FAF6EF').trim() || '#FAF6EF';
+
+  // 그냥 body 맨 끝에 자연스럽게 붙여서 캡처한다 (position:fixed/absolute는 html2canvas가
+  // 좌표를 잘못 계산해 빈 캔버스를 만드는 경우가 있어 사용하지 않음).
   const wrapper = document.createElement('div');
-  wrapper.style.cssText = 'background:#FAF6EF;padding:24px;width:760px;';
+  wrapper.style.cssText = `background:${paperColor};padding:24px;width:760px;`;
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
 
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
   try {
-    const opt = {
-      margin: 8,
-      filename: 'report.pdf',
-      image: { type: 'jpeg', quality: 0.95 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#FAF6EF' },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak: { mode: ['css', 'legacy'] }
-    };
-    const blob = await window.html2pdf().set(opt).from(wrapper).outputPdf('blob');
-    return blob;
+    const canvas = await window.html2canvas(wrapper, { scale: 2, useCORS: true, backgroundColor: paperColor });
+
+    // html2pdf.js의 자동 페이지 나누기(pagebreak) 로직이 콘텐츠가 길 때 빈 페이지를 만드는 문제가 있어,
+    // 캡처된 캔버스를 직접 A4 비율로 잘라 페이지마다 이미지로 삽입하는 방식으로 안정성을 확보한다.
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const pageWmm = pdf.internal.pageSize.getWidth();
+    const pageHmm = pdf.internal.pageSize.getHeight();
+    const marginMm = 6;
+    const contentWmm = pageWmm - marginMm * 2;
+    const contentHmm = pageHmm - marginMm * 2;
+
+    const pxPerMm = canvas.width / contentWmm;
+    const pageHeightPx = Math.floor(contentHmm * pxPerMm);
+
+    let renderedPx = 0;
+    let pageIndex = 0;
+    while (renderedPx < canvas.height) {
+      const sliceHeightPx = Math.min(pageHeightPx, canvas.height - renderedPx);
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = sliceHeightPx;
+      const ctx = pageCanvas.getContext('2d');
+      ctx.fillStyle = paperColor;
+      ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+      ctx.drawImage(canvas, 0, renderedPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx);
+
+      const imgData = pageCanvas.toDataURL('image/jpeg', 0.95);
+      if (pageIndex > 0) pdf.addPage();
+      const sliceHmm = sliceHeightPx / pxPerMm;
+      pdf.addImage(imgData, 'JPEG', marginMm, marginMm, contentWmm, sliceHmm);
+
+      renderedPx += sliceHeightPx;
+      pageIndex += 1;
+    }
+
+    return pdf.output('blob');
   } finally {
     document.body.removeChild(wrapper);
   }
