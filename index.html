@@ -2328,32 +2328,35 @@ async function buildPptxBlob(a) {
   pptx.layout = 'LAYOUT_WIDE'; // 13.33 x 7.5 in
   const FONT = '맑은 고딕';
 
-  const bgOpt = { color: theme.line ? 'FFFFFF' : 'FFFFFF' };
+  const bgOpt = { color: theme.paper };
   const diff = a.difficulty_summary || {};
   const hardishCount = (diff['상']||0) + (diff['최상']||0);
 
-  // 1) 표지 — 제목/부제/배지만 (통계는 다음 페이지로)
+  // 1) 표지 — 풀블리드 배경 + 대형 타이포그래피로 시선을 끄는 임팩트 있는 디자인
   let s = pptx.addSlide();
-  s.background = bgOpt;
-  s.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
-    x: 0.5, y: 0.4, w: 12.33, h: 1.5, fill: { color: theme.navy }, rectRadius: 0.05
+  s.background = { color: theme.navy };
+  s.addText(`${info.exam_name||''} · ${info.date||''}`, {
+    x: 0.7, y: 0.55, w: 12, h: 0.5, fontFace: FONT, fontSize: 16, color: theme.coral, bold: true, charSpacing: 2
   });
-  s.addText(`${info.school||''} · ${info.grade||''} ${info.subject||''}`, {
-    x: 0.85, y: 0.55, w: 9.5, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: 'FFFFFF'
+  s.addText(`${info.school||''} ${info.grade||''}`, {
+    x: 0.7, y: 1.25, w: 12, h: 1.5, fontFace: FONT, fontSize: 54, bold: true, color: 'FFFFFF'
   });
-  s.addText(`${info.exam_name||''}  ·  ${info.date||''}  ·  총 ${info.total_questions||'-'}문항  ·  ${info.total_points||'-'}점`, {
-    x: 0.85, y: 1.15, w: 9.5, h: 0.5, fontFace: FONT, fontSize: 13, color: 'C7CFE3'
+  s.addText(`${info.subject||''} 분석`, {
+    x: 0.7, y: 2.75, w: 12, h: 2.1, fontFace: FONT, fontSize: 72, bold: true, color: theme.coral, charSpacing: 4
+  });
+  s.addText(`총 ${info.total_questions||'-'}문항 · ${info.total_points||'-'}점${info.scope ? '  ·  ' + info.scope : ''}`, {
+    x: 0.7, y: 5.15, w: 12, h: 0.6, fontFace: FONT, fontSize: 15, color: 'C7CFE3'
   });
   s.addShape(pptx.shapes.OVAL, {
-    x: 11.35, y: 0.6, w: 1.0, h: 1.0, fill: { type: 'none' }, line: { color: theme.coral, width: 1.5 }
+    x: 11.7, y: 0.55, w: 0.9, h: 0.9, fill: { type: 'none' }, line: { color: theme.coral, width: 1.5 }
   });
   s.addText('분석\n완료', {
-    x: 11.35, y: 0.6, w: 1.0, h: 1.0, align: 'center', valign: 'middle',
-    fontFace: FONT, fontSize: 10.5, bold: true, color: theme.coral, lineSpacing: 13
+    x: 11.7, y: 0.55, w: 0.9, h: 0.9, align: 'center', valign: 'middle',
+    fontFace: FONT, fontSize: 9.5, bold: true, color: theme.coral, lineSpacing: 12
   });
-  if (info.scope) {
-    s.addText(`시험범위: ${info.scope}`, { x: 0.6, y: 2.05, w: 12.1, h: 0.35, fontFace: FONT, fontSize: 11.5, color: theme.muted, italic: true });
-  }
+  s.addText('시험분석기 · Exam Analyzer', {
+    x: 0.7, y: 6.9, w: 12, h: 0.4, fontFace: FONT, fontSize: 12, color: '8B8B95'
+  });
 
   // 2) 핵심 요약 — 통계 카드 + 난이도표 + 단원별 비중 + 유형 분포를 한 슬라이드에 (웹 리포트 상단 구성과 동일)
   const units = a.unit_distribution || [];
