@@ -191,6 +191,8 @@
   }
   .swatch-preview.show{display:block;}
   .swatch-preview-inner{width:640px;transform:scale(0.3594);transform-origin:top left;}
+  .sections-wrap.pdf-export-mode .section::before,
+  .sections-wrap.pdf-export-mode::before{display:none !important;}
   .theme-btn{
     display:flex;flex-direction:column;align-items:center;gap:6px;
     background:var(--card);border:1.5px solid var(--line);border-radius:4px;
@@ -2442,6 +2444,17 @@ async function buildPdfBlob(reportNode) {
   if (actionsDiv) actionsDiv.remove();
   const noteP = clone.querySelector('p.note');
   if (noteP && noteP.parentElement === clone) noteP.remove();
+
+  // PDF는 화면을 그대로 캡처하는 방식이라, 타임라인형처럼 가로 스크롤로 콘텐츠가 화면 밖으로 넘어가는
+  // 레이아웃은 그대로 캡처하면 잘려버린다. PDF 생성 시에는 항상 세로로 정상 나열되도록 강제로 되돌린다.
+  const sectionsWrap = clone.querySelector('.sections-wrap');
+  if (sectionsWrap) {
+    sectionsWrap.classList.add('pdf-export-mode');
+    sectionsWrap.style.cssText = 'display:block !important;';
+    sectionsWrap.querySelectorAll(':scope > .section').forEach(sec => {
+      sec.style.cssText += 'flex:none !important;width:100% !important;max-width:100% !important;margin-bottom:16px !important;overflow:visible !important;column-span:none !important;display:block !important;';
+    });
+  }
 
   const cs = getComputedStyle(document.documentElement);
   const paperColor = (cs.getPropertyValue('--paper') || '#FAF6EF').trim() || '#FAF6EF';
