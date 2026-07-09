@@ -61,7 +61,7 @@
     --font-heading:'Song Myung';
     --font-mono:'JetBrains Mono';
   }
-  [data-theme="magazine"]{
+  [data-theme="editorial"]{
     --navy:#141414;
     --paper:#F4F1EA;
     --coral:#B3261E;
@@ -71,6 +71,18 @@
     --green:#3D5A40;
     --card:#F4F1EA;
     --font-heading:'Noto Serif KR';
+    --font-mono:'JetBrains Mono';
+  }
+  [data-theme="forest"]{
+    --navy:#26433A;
+    --paper:#F3F2EA;
+    --coral:#C97B3D;
+    --ink:#20281F;
+    --muted:#7C8577;
+    --line:#DCE0D4;
+    --green:#3D5A40;
+    --card:#FFFFFF;
+    --font-heading:'Song Myung';
     --font-mono:'JetBrains Mono';
   }
   *{box-sizing:border-box;}
@@ -216,55 +228,120 @@
   }
 
   /* ==== 매거진 테마: 카드형이 아닌 에디토리얼(잡지 지면) 레이아웃 ==== */
-  [data-theme="magazine"] .stamp-header{
+  [data-layout="magazine"] .stamp-header{
     background:none;color:var(--ink);border-bottom:3px solid var(--ink);border-radius:0;
     padding:0 0 20px;margin-bottom:28px;align-items:flex-end;
   }
-  [data-theme="magazine"] .stamp-header .meta-title{
+  [data-layout="magazine"] .stamp-header .meta-title{
     font-family:var(--font-heading),serif;font-weight:900;font-size:32px;line-height:1.25;color:var(--ink);
   }
-  [data-theme="magazine"] .stamp-header .meta-sub{
+  [data-layout="magazine"] .stamp-header .meta-sub{
     font-family:'Pretendard',sans-serif;font-size:12.5px;color:var(--muted);margin-top:10px;letter-spacing:.02em;
   }
-  [data-theme="magazine"] .seal{
+  [data-layout="magazine"] .seal{
     border:none;border-radius:0;width:auto;height:auto;transform:none;
     font-family:var(--font-mono),monospace;font-size:11px;color:var(--coral);
     writing-mode:vertical-rl;letter-spacing:.15em;font-weight:700;
   }
-  [data-theme="magazine"] .stat-row{
+  [data-layout="magazine"] .stat-row{
     display:flex;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
     padding:18px 0;margin-bottom:32px;
   }
-  [data-theme="magazine"] .stat-card{
+  [data-layout="magazine"] .stat-card{
     background:none;border:none;border-radius:0;padding:0 24px;flex:1;
     border-right:1px solid var(--line);text-align:center;
   }
-  [data-theme="magazine"] .stat-card:last-child{border-right:none;}
-  [data-theme="magazine"] .stat-card .num{
+  [data-layout="magazine"] .stat-card:last-child{border-right:none;}
+  [data-layout="magazine"] .stat-card .num{
     font-family:var(--font-heading),serif;font-size:30px;font-weight:900;color:var(--ink);
   }
-  [data-theme="magazine"] .section{
+  [data-layout="magazine"] .section{
     background:none;border:none;border-radius:0;padding:0;margin-bottom:36px;
     border-top:1px solid var(--line);padding-top:20px;
   }
-  [data-theme="magazine"] .section h3{
+  [data-layout="magazine"] .section h3{
     font-family:var(--font-heading),serif;font-size:13px;font-weight:700;color:var(--coral);
     text-transform:uppercase;letter-spacing:.12em;margin-bottom:18px;
   }
-  [data-theme="magazine"] .section h3 .tag{
+  [data-layout="magazine"] .section h3 .tag{
     background:none;color:var(--coral);padding:0;font-family:var(--font-heading),serif;
     font-size:13px;letter-spacing:.12em;
   }
-  [data-theme="magazine"] .diff-table th{background:none;color:var(--ink);border-bottom:2px solid var(--ink);font-weight:700;}
-  [data-theme="magazine"] .diff-table td{font-family:var(--font-heading),serif;font-size:15px;}
-  [data-theme="magazine"] .bar-fill{background:var(--ink);}
-  [data-theme="magazine"] .bar-track{background:var(--line);}
-  [data-theme="magazine"] .pill{
+  [data-layout="magazine"] .diff-table th{background:none;color:var(--ink);border-bottom:2px solid var(--ink);font-weight:700;}
+  [data-layout="magazine"] .diff-table td{font-family:var(--font-heading),serif;font-size:15px;}
+  [data-layout="magazine"] .bar-fill{background:var(--ink);}
+  [data-layout="magazine"] .bar-track{background:var(--line);}
+  [data-layout="magazine"] .pill{
     background:none;border:1px solid var(--ink);border-radius:0;color:var(--ink);
     font-family:'Pretendard',sans-serif;
   }
-  [data-theme="magazine"] .items th{background:var(--ink);}
-  [data-theme="magazine"] .items{border-top:2px solid var(--ink);}
+  [data-layout="magazine"] .items th{background:var(--ink);}
+  [data-layout="magazine"] .items{border-top:2px solid var(--ink);}
+
+  /* ==== 인포그래픽형: 둥근 배지, 컬러풀한 원형 강조, 여백 넉넉 ==== */
+  [data-layout="infographic"] .stamp-header{border-radius:24px;}
+  [data-layout="infographic"] .stat-row{gap:20px;}
+  [data-layout="infographic"] .stat-card{
+    border-radius:50%;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border:3px solid var(--navy);background:var(--card);padding:10px;
+  }
+  [data-layout="infographic"] .stat-card .num{font-size:30px;}
+  [data-layout="infographic"] .stat-card .lbl{font-size:10px;}
+  [data-layout="infographic"] .section{border-radius:20px;border-width:2px;}
+  [data-layout="infographic"] .section h3 .tag{border-radius:50px;padding:4px 12px;}
+  [data-layout="infographic"] .diff-table th{border-radius:0;}
+  [data-layout="infographic"] .diff-table{border-radius:14px;overflow:hidden;}
+  [data-layout="infographic"] .pill{border-radius:50px;padding:6px 14px;font-weight:700;}
+  [data-layout="infographic"] .bar-track, [data-layout="infographic"] .bar-fill{border-radius:50px;}
+  [data-layout="infographic"] .key-item-card, [data-layout="infographic"] .strategy-card, [data-layout="infographic"] .match-case-card{border-radius:20px;}
+
+  /* ==== 타임라인형: 세로 선 + 원형 마커로 섹션을 잇는 구조 ==== */
+  [data-layout="timeline"] .layout, [data-layout="timeline"] .wizard-inner.wide{position:relative;}
+  [data-layout="timeline"] .section{
+    position:relative;padding-left:32px;border:none;background:none;box-shadow:none;
+    border-left:3px solid var(--line);margin-bottom:30px;padding-bottom:6px;
+  }
+  [data-layout="timeline"] .section:last-child{border-left-color:transparent;}
+  [data-layout="timeline"] .section::before{
+    content:'';position:absolute;left:-9px;top:2px;width:16px;height:16px;border-radius:50%;
+    background:var(--coral);border:3px solid var(--paper);box-shadow:0 0 0 2px var(--coral);
+  }
+  [data-layout="timeline"] .section h3{margin-left:6px;}
+  [data-layout="timeline"] .stamp-header{border-radius:0 0 0 0;}
+  [data-layout="timeline"] .stat-row{padding-left:32px;border-left:3px solid var(--line);margin-left:0;}
+
+  /* ==== 미니멀형: 테두리/배경 최소화, 타이포와 여백만으로 구성 ==== */
+  [data-layout="minimal"] .stamp-header{background:none;color:var(--ink);border:none;padding:0 0 20px;}
+  [data-layout="minimal"] .stamp-header .meta-title{color:var(--ink);}
+  [data-layout="minimal"] .stamp-header .meta-sub{color:var(--muted);}
+  [data-layout="minimal"] .seal{display:none;}
+  [data-layout="minimal"] .stat-row{background:none;border:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;}
+  [data-layout="minimal"] .stat-card{background:none;border:none;box-shadow:none;}
+  [data-layout="minimal"] .section{background:none;border:none;box-shadow:none;border-bottom:1px solid var(--line);border-radius:0;padding:0 0 22px;}
+  [data-layout="minimal"] .section h3 .tag{background:none;color:var(--muted);padding:0;}
+  [data-layout="minimal"] .diff-table th{background:none;color:var(--ink);border-bottom:1px solid var(--ink);}
+  [data-layout="minimal"] .pill{background:none;border:1px solid var(--line);border-radius:0;}
+  [data-layout="minimal"] .key-item-card, [data-layout="minimal"] .strategy-card, [data-layout="minimal"] .match-case-card{
+    background:none;border:none;border-left:2px solid var(--line);border-radius:0;box-shadow:none;
+  }
+  [data-layout="minimal"] .items th{background:none;color:var(--ink);border-bottom:1px solid var(--ink);}
+
+  /* ==== 대시보드형: 조밀한 그리드, 카드형 위젯, 그림자 강조 ==== */
+  [data-layout="dashboard"] .stat-row{gap:10px;}
+  [data-layout="dashboard"] .stat-card{
+    box-shadow:0 2px 8px rgba(0,0,0,.08);border-radius:8px;padding:14px 10px;
+  }
+  [data-layout="dashboard"] .stat-card .num{font-size:24px;}
+  [data-layout="dashboard"] .section{
+    box-shadow:0 2px 10px rgba(0,0,0,.06);border-radius:10px;padding:18px 20px;
+  }
+  [data-layout="dashboard"] .key-item-grid, [data-layout="dashboard"] .strategy-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+  }
+  [data-layout="dashboard"] .key-item-card, [data-layout="dashboard"] .strategy-card{
+    box-shadow:0 2px 6px rgba(0,0,0,.06);border-radius:8px;
+  }
+  [data-layout="dashboard"] .diff-table{box-shadow:0 2px 6px rgba(0,0,0,.06);border-radius:8px;overflow:hidden;}
 
   .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
   .bar-row .name{width:120px;flex:none;font-weight:600;}
@@ -730,7 +807,7 @@
       </div>
 
       <div class="theme-row">
-        <span class="label-main" style="font-size:13px;display:block;margin-bottom:10px;">리포트 디자인 테마</span>
+        <span class="label-main" style="font-size:13px;display:block;margin-bottom:10px;">색상 테마</span>
         <div class="theme-swatches" id="themeSwatches">
           <button type="button" class="theme-btn active" data-theme="navy" title="네이비 저널">
             <span class="swatch-dot" style="background:#1B2A4A;"></span>네이비
@@ -744,9 +821,24 @@
           <button type="button" class="theme-btn" data-theme="dark" title="다크">
             <span class="swatch-dot" style="background:#1C1C1E;"></span>다크
           </button>
-          <button type="button" class="theme-btn" data-theme="magazine" title="매거진">
-            <span class="swatch-dot" style="background:#B3261E;"></span>매거진
+          <button type="button" class="theme-btn" data-theme="editorial" title="에디토리얼">
+            <span class="swatch-dot" style="background:#B3261E;"></span>에디토리얼
           </button>
+          <button type="button" class="theme-btn" data-theme="forest" title="포레스트">
+            <span class="swatch-dot" style="background:#3D5A40;"></span>포레스트
+          </button>
+        </div>
+      </div>
+
+      <div class="theme-row">
+        <span class="label-main" style="font-size:13px;display:block;margin-bottom:10px;">레이아웃 구조</span>
+        <div class="theme-swatches" id="layoutSwatches">
+          <button type="button" class="theme-btn active" data-layout="card" title="카드형(기본)">카드형</button>
+          <button type="button" class="theme-btn" data-layout="magazine" title="매거진형">매거진형</button>
+          <button type="button" class="theme-btn" data-layout="infographic" title="인포그래픽형">인포그래픽형</button>
+          <button type="button" class="theme-btn" data-layout="timeline" title="타임라인형">타임라인형</button>
+          <button type="button" class="theme-btn" data-layout="minimal" title="미니멀형">미니멀형</button>
+          <button type="button" class="theme-btn" data-layout="dashboard" title="대시보드형">대시보드형</button>
         </div>
       </div>
 
@@ -848,6 +940,20 @@ themeSwatches.addEventListener('click', (e) => {
   currentTheme = btn.dataset.theme;
   document.documentElement.setAttribute('data-theme', currentTheme);
   themeSwatches.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b === btn));
+});
+
+let currentLayout = 'card';
+const layoutSwatches = document.getElementById('layoutSwatches');
+layoutSwatches.addEventListener('click', (e) => {
+  const btn = e.target.closest('.theme-btn');
+  if (!btn) return;
+  currentLayout = btn.dataset.layout;
+  if (currentLayout === 'card') {
+    document.documentElement.removeAttribute('data-layout');
+  } else {
+    document.documentElement.setAttribute('data-layout', currentLayout);
+  }
+  layoutSwatches.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b === btn));
 });
 
 // ====== 시험 정보 입력 (교과과정 단원 선택) ======
@@ -1244,6 +1350,7 @@ navMypage.addEventListener('click', () => {
 async function saveAnalysisToHistory(a) {
   if (!supabaseClient || !currentUser) return;
   const info = a.exam_info || {};
+  a.layout = currentLayout;
   try {
     await supabaseClient.from('analyses').insert({
       user_id: currentUser.id,
@@ -1332,6 +1439,10 @@ async function loadMypage() {
         document.documentElement.setAttribute('data-theme', currentTheme);
         themeSwatches.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.theme === currentTheme));
       }
+      currentLayout = (row.analysis && row.analysis.layout) || 'card';
+      if (currentLayout === 'card') document.documentElement.removeAttribute('data-layout');
+      else document.documentElement.setAttribute('data-layout', currentLayout);
+      layoutSwatches.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.dataset.layout === currentLayout));
       lastAnalysis = row.analysis;
       navNew.click();
       renderReport(row.analysis);
