@@ -507,6 +507,10 @@
   .match-case-card .mc-source{font-size:11.5px;color:var(--muted);}
   .match-case-card .mc-right{flex:none;width:180px;}
   .match-case-card .mc-right img{width:100%;border-radius:4px;border:1px solid var(--line);display:block;}
+  .trend-box{
+    background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--green);
+    border-radius:4px;padding:16px 18px;font-size:13.5px;color:var(--ink);line-height:1.75;
+  }
 
   .prep-view{margin-bottom:14px;}
   .prep-view .pv-title{font-weight:700;font-size:13.5px;color:var(--navy);margin-bottom:6px;}
@@ -1256,6 +1260,34 @@ async function saveAnalysisToHistory(a) {
   }
 }
 
+// 같은 학교/과목의 과거 분석 이력을 찾아 AI에게 넘길 요약 컨텍스트를 만든다 (없으면 null)
+async function fetchHistoryContext(examMeta) {
+  if (!supabaseClient || !currentUser || !examMeta.school || !examMeta.subject) return null;
+  try {
+    const { data, error } = await supabaseClient
+      .from('analyses')
+      .select('exam_name, exam_date, analysis')
+      .eq('school', examMeta.school)
+      .eq('subject', examMeta.subject)
+      .order('exam_date', { ascending: false })
+      .limit(5);
+    if (error || !data || !data.length) return null;
+
+    const lines = data.map(row => {
+      const a = row.analysis || {};
+      const diff = a.difficulty_summary || {};
+      const topUnits = (a.unit_distribution || []).slice(0, 3).map(u => `${u.unit}(${u.count}문항)`).join(', ');
+      const topTypes = (a.type_distribution || []).map(t => `${t.type} ${t.count}문항`).join(', ');
+      return `- ${row.exam_name || ''} (${row.exam_date || '날짜 미상'}): 최종난이도 ${a.final_difficulty || '-'}, 난이도분포 하${diff['하']??0}/중하${diff['중하']??0}/중${diff['중']??0}/중상${diff['중상']??0}/상${diff['상']??0}/최상${diff['최상']??0}, 주요단원 ${topUnits || '-'}, 유형 ${topTypes || '-'}`;
+    }).join('\n');
+
+    return { count: data.length, text: lines };
+  } catch (err) {
+    console.error('과거 이력 조회 실패:', err);
+    return null;
+  }
+}
+
 async function loadMypage() {
   if (mypageView.style.display === 'none') return;
   if (!supabaseClient) {
@@ -1366,7 +1398,7 @@ async function pdfToImages(file) {
   return images;
 }
 
-async function analyzeWithClaude(images, includeDetail, examMeta, useMockSearch, attempt) {
+async function analyzeWithClaude(images, includeDetail, examMeta, useMockSearch, historyContext, attempt) {
   attempt = attempt || 1;
   const content = images.map(img => ({
     type: 'image',
@@ -1376,6 +1408,17 @@ async function analyzeWithClaude(images, includeDetail, examMeta, useMockSearch,
   const unitListText = examMeta.units.length
     ? examMeta.units.map(u => `- ${u}`).join('\n')
     : '(선생님이 단원을 지정하지 않았으니, 과목의 일반적인 대단원 체계를 기준으로 네가 직접 분류해줘)';
+
+  const historyInstructions = (historyContext && historyContext.text) ? `
+
+과거 시험 비교 분석 (중요):
+- 같은 학교/과목의 과거 분석 기록이 아래에 있어. 이번 시험을 이 기록들과 비교해서 trend_comparison 필드에 작성해줘.
+- 난이도 변화(예: 작년보다 최종난이도가 올랐는지), 유형 구성 변화, 출제 경향의 변화를 구체적인 근거(과거 기록의 실제 수치)를 들어 설명해.
+- 단정적으로 "매년 어려워지고 있다" 같은 과장은 하지 말고, 실제 데이터 차이만 근거로 삼아.
+- 2~4문장으로 작성해.
+
+과거 분석 기록 (최신순, 최대 5건):
+${historyContext.text}` : '';
 
   const mockSearchInstructions = useMockSearch ? `
 
@@ -1433,6 +1476,7 @@ ${unitListText}
 - "최상"과 "상"을 과도하게 남발하지 마. 배점이 같으면 번호가 뒤인 것을 더 어려운 쪽으로 분류해.
 - 전체 문항 구성을 바탕으로 이 시험의 "최종난이도"도 하/중하/중/중상/상/최상 중 하나로 총평해줘.
 ${mockSearchInstructions}
+${historyInstructions}
 
 다음 JSON 형식으로만 응답해. 다른 텍스트는 절대 포함하지 마:
 
@@ -1476,7 +1520,7 @@ ${mockSearchInstructions}
       "title": "이번 시험에서 드러난 약점에 기반한 구체적 학습 전략 제목 (예: '조건의 제한 범위 끝까지 확인하기')",
       "description": "왜 이 전략이 필요한지와 실천 방법을 2~3문장으로 설명"
     }
-  ]
+  ]${(historyContext && historyContext.text) ? ',\n  "trend_comparison": "과거 시험 기록과 비교한 2~4문장 분석. 과거 기록이 제공되지 않았다면 이 필드는 만들지 마."' : ''}
 }
 
 핵심 문항(key_items) 및 학습 전략(study_strategies) 작성 규칙 (중요):
@@ -1509,7 +1553,7 @@ ${mockSearchInstructions}
   } catch (networkErr) {
     if (attempt < 3) {
       await new Promise(r => setTimeout(r, 1200));
-      return analyzeWithClaude(images, includeDetail, examMeta, useMockSearch, attempt + 1);
+      return analyzeWithClaude(images, includeDetail, examMeta, useMockSearch, historyContext, attempt + 1);
     }
     throw new Error('네트워크 요청이 끊겼습니다 (이미지 용량이 너무 크거나 일시적 연결 문제일 수 있어요). 페이지 수가 적은 시험지로 먼저 테스트해보거나, 잠시 후 다시 시도해 주세요. (' + networkErr.message + ')');
   }
@@ -1563,7 +1607,7 @@ ${mockSearchInstructions}
     if (attempt < 3) {
       // 모델이 형식을 안 지켰을 때, 자동으로 한 번 더 시도 (일시적 실수일 가능성이 높음)
       await new Promise(r => setTimeout(r, 800));
-      return analyzeWithClaude(images, includeDetail, examMeta, useMockSearch, attempt + 1);
+      return analyzeWithClaude(images, includeDetail, examMeta, useMockSearch, historyContext, attempt + 1);
     }
     throw new Error('AI 응답에서 올바른 JSON 형식을 찾지 못했습니다 (여러 번 재시도했지만 실패). 페이지 수를 줄이거나 잠시 후 다시 시도해 주세요. 원본 일부: ' + text.slice(0, 200));
   }
@@ -1749,6 +1793,12 @@ function renderReport(a) {
     html += `</div></div>`;
   }
 
+  if (a.trend_comparison) {
+    html += `<div class="section"><h3><span class="tag">TREND</span> 과거 시험 대비 변화</h3>
+      <div class="trend-box">${a.trend_comparison}</div>
+    </div>`;
+  }
+
   if (a.insights && a.insights.length) {
     html += `<div class="section"><h3><span class="tag">INSIGHT</span> 출제 경향 코멘트</h3>
       <ul style="margin:0;padding-left:18px;font-size:13px;">`;
@@ -1875,6 +1925,9 @@ function buildMarkdownString(a) {
     md += `\n## 핵심 문항 분석\n\n`;
     a.key_items.forEach(ki => md += `### 문항 ${ki.number} — ${ki.title||''}\n\n${ki.reason||''}\n\n`);
   }
+  if (a.trend_comparison) {
+    md += `\n## 과거 시험 대비 변화\n\n${a.trend_comparison}\n`;
+  }
   if (a.insights && a.insights.length) {
     md += `\n## 출제 경향 코멘트\n\n`;
     a.insights.forEach(i => md += `- ${i}\n`);
@@ -1935,6 +1988,10 @@ function buildManuscriptString(a) {
 
   if (a.insights && a.insights.length) {
     a.insights.forEach(i => { body += `${i}\n\n`; });
+  }
+
+  if (a.trend_comparison) {
+    body += `## 이전 시험과 비교하면\n\n${a.trend_comparison}\n\n`;
   }
 
   if (a.key_items && a.key_items.length) {
@@ -2369,6 +2426,12 @@ async function buildDocxBlob(a) {
     });
   }
 
+  const trendSection = [];
+  if (a.trend_comparison) {
+    trendSection.push(sectionHeading('과거 시험 대비 변화'));
+    trendSection.push(new Paragraph({ spacing: { after: 160 }, children: [run(a.trend_comparison, { size: 22 })] }));
+  }
+
   const insightHeading = sectionHeading('출제 경향 코멘트');
   const insightParas = (a.insights||[]).map(i => new Paragraph({ bullet: { level: 0 }, children: [run(i, { size: 22 })] }));
 
@@ -2409,6 +2472,7 @@ async function buildDocxBlob(a) {
         new Paragraph({ text: '' }),
         ...matchSection,
         ...keyItemsSection,
+        ...trendSection,
         insightHeading, ...insightParas,
         ...strategySection,
         ...prepSection
@@ -2621,6 +2685,15 @@ async function buildPptxBlob(a) {
     });
   }
 
+  // 5-2) 과거 시험 대비 변화
+  if (a.trend_comparison) {
+    s = pptx.addSlide();
+    s.background = bgOpt;
+    s.addText('과거 시험 대비 변화', { x: 0.6, y: 0.4, w: 11, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy });
+    s.addShape(pptx.shapes.RECTANGLE, { x: 0.6, y: 1.3, w: 0.06, h: 4.5, fill: { color: theme.green || '4A7C59' }, line: { type: 'none' } });
+    s.addText(a.trend_comparison, { x: 0.9, y: 1.3, w: 11.5, h: 4.5, fontFace: FONT, fontSize: 15, color: theme.ink || '201D1A', valign: 'top' });
+  }
+
   // 6) 출제 경향 코멘트
   if (a.insights && a.insights.length) {
     s = pptx.addSlide();
@@ -2692,10 +2765,12 @@ analyzeBtn.addEventListener('click', async () => {
 
   try {
     const images = await pdfToImages(selectedFile);
+    stageText.textContent = '과거 분석 이력을 확인하는 중…';
+    const historyContext = await fetchHistoryContext(examMeta);
     stageText.textContent = toggleMockSearch.checked
       ? 'Claude가 문항을 분석하고 모의고사 유사 출처를 검색하는 중… (시간이 더 걸릴 수 있어요)'
       : 'Claude가 문항을 분석하는 중… (시간이 걸릴 수 있어요)';
-    const analysis = await analyzeWithClaude(images, toggleDetail.checked, examMeta, toggleMockSearch.checked);
+    const analysis = await analyzeWithClaude(images, toggleDetail.checked, examMeta, toggleMockSearch.checked, historyContext);
     lastAnalysis = analysis;
     renderReport(analysis);
     saveAnalysisToHistory(analysis);
