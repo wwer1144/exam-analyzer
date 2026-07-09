@@ -488,7 +488,8 @@
   .source-input:hover, .source-input:focus{border-color:var(--line);background:var(--paper);outline:none;}
   .source-input::placeholder{color:#C8C2B3;}
 
-  .match-cell{text-align:center;}
+  .match-cell{text-align:center;outline:none;border-radius:4px;}
+  .match-cell:focus{box-shadow:0 0 0 2px var(--coral) inset;background:var(--paper);}
   .match-upload-btn{
     display:inline-block;font-size:11px;color:var(--muted);border:1px dashed var(--line);
     border-radius:4px;padding:6px 10px;cursor:pointer;white-space:nowrap;
@@ -1707,7 +1708,7 @@ function renderReport(a) {
       <td>${difficultyLabel(it.difficulty)}</td>
       <td class="src-text">${it.summary||''}${it.mock_exam_source ? `<br><span class="mock-badge">🔍 ${it.mock_exam_source}</span>` : ''}</td>
       <td><input type="text" class="source-input" data-idx="${idx}" placeholder="예: 유형 아카이브" value="${(it.source||'').replace(/"/g,'&quot;')}"></td>
-      <td class="match-cell" data-idx="${idx}">
+      <td class="match-cell" data-idx="${idx}" tabindex="0" title="클릭 후 Ctrl+V로 이미지 붙여넣기 가능">
         ${it.matched_img
           ? `<img src="${it.matched_img}" class="match-thumb" data-idx="${idx}">`
           : `<label class="match-upload-btn">+ 첨부<input type="file" accept="image/*" class="match-upload-input" data-idx="${idx}" style="display:none;"></label>`}
@@ -1715,7 +1716,7 @@ function renderReport(a) {
     </tr>`;
   });
   html += `</tbody></table>
-  <p class="note" style="margin-top:10px;">ⓘ "적중자료" 칸에는 시험 문제 이미지를 올리는 게 아니라, <b>선생님이 실제로 수업 때 쓴 교재·프린트 사진</b>을 첨부해주세요. 시험 문제 원문은 저작권 문제로 다루지 않습니다.</p>
+  <p class="note" style="margin-top:10px;">ⓘ "적중자료" 칸에는 시험 문제 이미지를 올리는 게 아니라, <b>선생님이 실제로 수업 때 쓴 교재·프린트 사진</b>을 첨부해주세요. 시험 문제 원문은 저작권 문제로 다루지 않습니다. 칸을 클릭한 뒤 <b>Ctrl+V</b>로 클립보드 이미지를 바로 붙여넣을 수도 있어요.</p>
   </div>`;
 
   const matchedItems = (a.items||[]).filter(it => it.matched_img);
@@ -1804,21 +1805,24 @@ function renderReport(a) {
     hitRateInput.addEventListener('input', (e) => { a.hit_rate = e.target.value; });
   }
 
+  function attachMatchedImage(idx, file) {
+    if (!file || !a.items || !a.items[idx]) return;
+    if (!file.type || !file.type.startsWith('image/')) return;
+    if (file.size > 4 * 1024 * 1024) {
+      alert('이미지 용량이 너무 큽니다 (4MB 이하로 올려주세요).');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      a.items[idx].matched_img = reader.result;
+      renderReport(a);
+    };
+    reader.readAsDataURL(file);
+  }
+
   reportEl.querySelectorAll('.match-upload-input').forEach(inp => {
     inp.addEventListener('change', (e) => {
-      const idx = Number(e.target.dataset.idx);
-      const file = e.target.files[0];
-      if (!file || !a.items || !a.items[idx]) return;
-      if (file.size > 4 * 1024 * 1024) {
-        alert('이미지 용량이 너무 큽니다 (4MB 이하로 올려주세요).');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        a.items[idx].matched_img = reader.result;
-        renderReport(a);
-      };
-      reader.readAsDataURL(file);
+      attachMatchedImage(Number(e.target.dataset.idx), e.target.files[0]);
     });
   });
   reportEl.querySelectorAll('.match-thumb').forEach(thumb => {
@@ -1827,6 +1831,19 @@ function renderReport(a) {
       if (confirm('첨부된 적중 자료 이미지를 삭제할까요?')) {
         a.items[idx].matched_img = '';
         renderReport(a);
+      }
+    });
+  });
+  reportEl.querySelectorAll('.match-cell').forEach(cell => {
+    cell.addEventListener('paste', (e) => {
+      const idx = Number(cell.dataset.idx);
+      const items = (e.clipboardData || window.clipboardData).items;
+      for (const item of items) {
+        if (item.type && item.type.startsWith('image/')) {
+          e.preventDefault();
+          attachMatchedImage(idx, item.getAsFile());
+          break;
+        }
       }
     });
   });
