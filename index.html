@@ -487,6 +487,26 @@
   }
   .source-input:hover, .source-input:focus{border-color:var(--line);background:var(--paper);outline:none;}
   .source-input::placeholder{color:#C8C2B3;}
+
+  .match-cell{text-align:center;}
+  .match-upload-btn{
+    display:inline-block;font-size:11px;color:var(--muted);border:1px dashed var(--line);
+    border-radius:4px;padding:6px 10px;cursor:pointer;white-space:nowrap;
+  }
+  .match-upload-btn:hover{border-color:var(--coral);color:var(--coral);}
+  .match-thumb{width:44px;height:44px;object-fit:cover;border-radius:4px;border:1px solid var(--line);cursor:pointer;}
+  .match-case-grid{display:flex;flex-direction:column;gap:14px;}
+  .match-case-card{
+    display:flex;gap:16px;border:1px solid var(--line);border-radius:4px;padding:14px;background:var(--card);
+    align-items:flex-start;
+  }
+  .match-case-card .mc-left{flex:1;min-width:0;}
+  .match-case-card .mc-num{font-weight:700;font-size:13px;color:var(--navy);margin-bottom:6px;}
+  .match-case-card .mc-summary{font-size:13px;color:var(--ink);line-height:1.6;margin-bottom:6px;}
+  .match-case-card .mc-source{font-size:11.5px;color:var(--muted);}
+  .match-case-card .mc-right{flex:none;width:180px;}
+  .match-case-card .mc-right img{width:100%;border-radius:4px;border:1px solid var(--line);display:block;}
+
   .prep-view{margin-bottom:14px;}
   .prep-view .pv-title{font-weight:700;font-size:13.5px;color:var(--navy);margin-bottom:6px;}
   .prep-view .pv-content{font-size:13px;color:var(--ink);white-space:pre-wrap;line-height:1.7;}
@@ -1676,7 +1696,7 @@ function renderReport(a) {
 
   html += `<div class="section"><h3><span class="tag">LIST</span> 문항별 분석</h3>
     <table class="items"><thead><tr>
-      <th>번호</th><th>단원</th><th>유형</th><th>배점</th><th>난이도</th><th>요약</th><th>출처</th>
+      <th>번호</th><th>단원</th><th>유형</th><th>배점</th><th>난이도</th><th>요약</th><th>출처</th><th>적중자료</th>
     </tr></thead><tbody>`;
   (a.items||[]).forEach((it, idx) => {
     html += `<tr>
@@ -1687,9 +1707,33 @@ function renderReport(a) {
       <td>${difficultyLabel(it.difficulty)}</td>
       <td class="src-text">${it.summary||''}${it.mock_exam_source ? `<br><span class="mock-badge">🔍 ${it.mock_exam_source}</span>` : ''}</td>
       <td><input type="text" class="source-input" data-idx="${idx}" placeholder="예: 유형 아카이브" value="${(it.source||'').replace(/"/g,'&quot;')}"></td>
+      <td class="match-cell" data-idx="${idx}">
+        ${it.matched_img
+          ? `<img src="${it.matched_img}" class="match-thumb" data-idx="${idx}">`
+          : `<label class="match-upload-btn">+ 첨부<input type="file" accept="image/*" class="match-upload-input" data-idx="${idx}" style="display:none;"></label>`}
+      </td>
     </tr>`;
   });
-  html += `</tbody></table></div>`;
+  html += `</tbody></table>
+  <p class="note" style="margin-top:10px;">ⓘ "적중자료" 칸에는 시험 문제 이미지를 올리는 게 아니라, <b>선생님이 실제로 수업 때 쓴 교재·프린트 사진</b>을 첨부해주세요. 시험 문제 원문은 저작권 문제로 다루지 않습니다.</p>
+  </div>`;
+
+  const matchedItems = (a.items||[]).filter(it => it.matched_img);
+  if (matchedItems.length) {
+    html += `<div class="section"><h3><span class="tag">MATCH</span> 적중 사례</h3>
+      <div class="match-case-grid">`;
+    matchedItems.forEach(it => {
+      html += `<div class="match-case-card">
+        <div class="mc-left">
+          <div class="mc-num">문항 ${it.number} · ${it.unit||''}</div>
+          <div class="mc-summary">${it.summary || '(요약 없음)'}</div>
+          ${it.source ? `<div class="mc-source">출처: ${it.source}</div>` : ''}
+        </div>
+        <div class="mc-right"><img src="${it.matched_img}" alt="적중 자료"></div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  }
 
   if (a.key_items && a.key_items.length) {
     html += `<div class="section"><h3><span class="tag">FOCUS</span> 핵심 문항 분석</h3>
@@ -1759,6 +1803,33 @@ function renderReport(a) {
   if (hitRateInput) {
     hitRateInput.addEventListener('input', (e) => { a.hit_rate = e.target.value; });
   }
+
+  reportEl.querySelectorAll('.match-upload-input').forEach(inp => {
+    inp.addEventListener('change', (e) => {
+      const idx = Number(e.target.dataset.idx);
+      const file = e.target.files[0];
+      if (!file || !a.items || !a.items[idx]) return;
+      if (file.size > 4 * 1024 * 1024) {
+        alert('이미지 용량이 너무 큽니다 (4MB 이하로 올려주세요).');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        a.items[idx].matched_img = reader.result;
+        renderReport(a);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+  reportEl.querySelectorAll('.match-thumb').forEach(thumb => {
+    thumb.addEventListener('click', () => {
+      const idx = Number(thumb.dataset.idx);
+      if (confirm('첨부된 적중 자료 이미지를 삭제할까요?')) {
+        a.items[idx].matched_img = '';
+        renderReport(a);
+      }
+    });
+  });
 
   wireUpActions(a);
 }
@@ -2157,7 +2228,7 @@ function splitObjSubj(items) {
 // 워드에서 한글이 안정적으로 렌더링되도록 모든 런에 동일한 한/영 폰트를 명시.
 // '맑은 고딕'은 Windows/한글 기본 내장 폰트라 사용자 PC에 별도 설치 없이 그대로 보임.
 async function buildDocxBlob(a) {
-  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, WidthType, AlignmentType } = docx;
+  const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel, WidthType, AlignmentType, ImageRun } = docx;
   const info = a.exam_info || {};
   const theme = getThemeHexColors();
 
@@ -2247,6 +2318,31 @@ async function buildDocxBlob(a) {
   ]}));
   const itemTable = new Table({ rows: [itemHeader, ...itemRows], width: { size: 100, type: WidthType.PERCENTAGE } });
 
+  // base64 데이터 URL을 docx ImageRun이 요구하는 Uint8Array로 변환
+  function dataUrlToUint8Array(dataUrl) {
+    const base64 = dataUrl.split(',')[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  }
+
+  const matchedItems = (a.items || []).filter(it => it.matched_img);
+  const matchSection = [];
+  if (matchedItems.length) {
+    matchSection.push(sectionHeading('적중 사례'));
+    matchedItems.forEach(it => {
+      matchSection.push(new Paragraph({ spacing: { before: 140 }, children: [run(`문항 ${it.number} · ${it.unit||''}`, { bold: true, size: 23, color: theme.navy })] }));
+      matchSection.push(new Paragraph({ spacing: { after: 80 }, children: [run(it.summary || '', { size: 22 })] }));
+      try {
+        matchSection.push(new Paragraph({
+          spacing: { after: 160 },
+          children: [new ImageRun({ data: dataUrlToUint8Array(it.matched_img), transformation: { width: 320, height: 240 } })]
+        }));
+      } catch (e) { /* 이미지 변환 실패 시 건너뜀 */ }
+    });
+  }
+
   const keyItemsSection = [];
   if (a.key_items && a.key_items.length) {
     keyItemsSection.push(sectionHeading('핵심 문항 분석'));
@@ -2294,6 +2390,7 @@ async function buildDocxBlob(a) {
         new Paragraph({ text: '' }),
         itemHeading, itemTable,
         new Paragraph({ text: '' }),
+        ...matchSection,
         ...keyItemsSection,
         insightHeading, ...insightParas,
         ...strategySection,
@@ -2474,6 +2571,21 @@ async function buildPptxBlob(a) {
       border: { type: 'solid', color: 'E3DDCF', pt: 0.5 },
       autoPage: false,
       fontFace: FONT
+    });
+  }
+
+  // 5-0) 적중 사례 (선생님이 첨부한 자료 이미지)
+  const matchedItemsPptx = (a.items || []).filter(it => it.matched_img);
+  if (matchedItemsPptx.length) {
+    matchedItemsPptx.forEach(it => {
+      s = pptx.addSlide();
+      s.background = bgOpt;
+      s.addText('적중 사례', { x: 0.6, y: 0.4, w: 8, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy });
+      s.addText(`문항 ${it.number} · ${it.unit||''}`, { x: 0.6, y: 1.2, w: 6, h: 0.5, fontFace: FONT, fontSize: 15, bold: true, color: theme.coral });
+      s.addText(it.summary || '', { x: 0.6, y: 1.75, w: 6, h: 4.5, fontFace: FONT, fontSize: 13, color: theme.ink || '201D1A', valign: 'top' });
+      try {
+        s.addImage({ data: it.matched_img, x: 7.0, y: 1.2, w: 5.5, h: 4.1, sizing: { type: 'contain', w: 5.5, h: 4.1 } });
+      } catch (e) { /* 이미지 추가 실패 시 건너뜀 */ }
     });
   }
 
