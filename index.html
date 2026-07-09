@@ -1816,9 +1816,18 @@ ${historyInstructions}
     if (useMockSearch) {
       requestBody.tools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 8 }];
     }
+    // 서버가 로그인 여부를 검증할 수 있도록 Supabase 로그인 토큰을 함께 전달 (미로그인 시 서버에서 거부됨)
+    let accessToken = '';
+    if (supabaseClient) {
+      const { data: sessionData } = await supabaseClient.auth.getSession();
+      accessToken = sessionData?.session?.access_token || '';
+    }
     response = await fetch('https://exam-analyzer-production-732c.up.railway.app/api/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': accessToken ? `Bearer ${accessToken}` : ''
+      },
       body: JSON.stringify(requestBody)
     });
   } catch (networkErr) {
@@ -1827,6 +1836,13 @@ ${historyInstructions}
       return analyzeWithClaude(images, includeDetail, examMeta, useMockSearch, historyContext, attempt + 1);
     }
     throw new Error('네트워크 요청이 끊겼습니다 (이미지 용량이 너무 크거나 일시적 연결 문제일 수 있어요). 페이지 수가 적은 시험지로 먼저 테스트해보거나, 잠시 후 다시 시도해 주세요. (' + networkErr.message + ')');
+  }
+
+  if (response.status === 401) {
+    throw new Error('로그인이 만료되었거나 인증에 실패했습니다. 다시 로그인한 후 시도해 주세요.');
+  }
+  if (response.status === 429) {
+    throw new Error('요청이 너무 잦습니다. 잠시 후 다시 시도해 주세요.');
   }
 
   const rawText = await response.text();
