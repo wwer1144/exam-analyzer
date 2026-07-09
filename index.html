@@ -22,6 +22,9 @@
     --line:#E3DDCF;
     --green:#4A7C59;
     --card:#FFFFFF;
+    --on-navy:#FFFFFF;
+    --on-coral:#FFFFFF;
+    --on-navy-muted:#B9C3DA;
     --font-heading:'Noto Serif KR';
     --font-mono:'JetBrains Mono';
   }
@@ -34,6 +37,9 @@
     --line:#DEDEDA;
     --green:#111111;
     --card:#FFFFFF;
+    --on-navy:#FFFFFF;
+    --on-coral:#FFFFFF;
+    --on-navy-muted:#BBBBBB;
     --font-heading:'Black Han Sans';
     --font-mono:'JetBrains Mono';
   }
@@ -46,6 +52,9 @@
     --line:#EADFF0;
     --green:#7FB59E;
     --card:#FFFFFF;
+    --on-navy:#FFFFFF;
+    --on-coral:#3A3450;
+    --on-navy-muted:#D9D6EC;
     --font-heading:'Gaegu';
     --font-mono:'Gaegu';
   }
@@ -58,6 +67,9 @@
     --line:#3A3A3C;
     --green:#6FCF97;
     --card:#26262A;
+    --on-navy:#1C1C1E;
+    --on-coral:#1C1C1E;
+    --on-navy-muted:#5C5A52;
     --font-heading:'Song Myung';
     --font-mono:'JetBrains Mono';
   }
@@ -70,6 +82,9 @@
     --line:#D8D1C2;
     --green:#3D5A40;
     --card:#F4F1EA;
+    --on-navy:#FFFFFF;
+    --on-coral:#FFFFFF;
+    --on-navy-muted:#C9C5BC;
     --font-heading:'Noto Serif KR';
     --font-mono:'JetBrains Mono';
   }
@@ -82,6 +97,9 @@
     --line:#DCE0D4;
     --green:#3D5A40;
     --card:#FFFFFF;
+    --on-navy:#FFFFFF;
+    --on-coral:#FFFFFF;
+    --on-navy-muted:#C7D1C9;
     --font-heading:'Song Myung';
     --font-mono:'JetBrains Mono';
   }
@@ -184,7 +202,7 @@
   .swatch-dot{width:20px;height:20px;border-radius:50%;border:1px solid rgba(0,0,0,.08);}
 
   button.primary{
-    width:100%;margin-top:22px;background:var(--navy);color:#fff;border:none;
+    width:100%;margin-top:22px;background:var(--navy);color:var(--on-navy);border:none;
     padding:14px;font-size:14px;font-weight:700;border-radius:3px;cursor:pointer;
     font-family:'Pretendard',sans-serif;letter-spacing:.01em;transition:background .15s;
   }
@@ -204,10 +222,10 @@
 
   .stamp-header{
     display:flex;justify-content:space-between;align-items:center;
-    background:var(--navy);color:#fff;border-radius:4px;padding:22px 26px;margin-bottom:22px;
+    background:var(--navy);color:var(--on-navy);border-radius:4px;padding:22px 26px;margin-bottom:22px;
   }
   .stamp-header .meta-title{font-family:var(--font-heading),serif;font-weight:700;font-size:19px;}
-  .stamp-header .meta-sub{font-family:var(--font-mono),monospace;font-size:12px;color:#B9C3DA;margin-top:6px;}
+  .stamp-header .meta-sub{font-family:var(--font-mono),monospace;font-size:12px;color:var(--on-navy-muted);margin-top:6px;}
   .seal{
     font-family:var(--font-heading),serif;font-weight:900;font-size:13px;color:var(--coral);
     border:2px solid var(--coral);border-radius:50%;width:64px;height:64px;
@@ -231,7 +249,7 @@
     display:flex;align-items:center;gap:8px;
   }
   .section h3 .tag{
-    font-family:var(--font-mono),monospace;font-size:10px;background:var(--coral);color:#fff;
+    font-family:var(--font-mono),monospace;font-size:10px;background:var(--coral);color:var(--on-coral);
     padding:2px 7px;border-radius:2px;font-weight:700;letter-spacing:.04em;
   }
 
@@ -444,7 +462,7 @@
   }
   .btn-outline{background:#fff;color:var(--navy);}
   .btn-outline:hover{background:#F0ECE0;}
-  .btn-solid{background:var(--navy);color:#fff;}
+  .btn-solid{background:var(--navy);color:var(--on-navy);}
   .btn-solid:hover{background:#26396B;}
 
   .error-box{
@@ -455,7 +473,7 @@
   /* ---- Auth header ---- */
   .auth-area{display:flex;align-items:center;gap:10px;font-family:'Pretendard',sans-serif;}
   .auth-btn{
-    background:var(--navy);color:#fff;border:none;padding:9px 16px;border-radius:3px;
+    background:var(--navy);color:var(--on-navy);border:none;padding:9px 16px;border-radius:3px;
     font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;
   }
   .auth-btn:hover{background:#26396B;}
@@ -497,7 +515,7 @@
   }
   .auth-field input:focus{outline:none;border-color:var(--coral);}
   .auth-submit{
-    width:100%;background:var(--navy);color:#fff;border:none;padding:12px;border-radius:3px;
+    width:100%;background:var(--navy);color:var(--on-navy);border:none;padding:12px;border-radius:3px;
     font-weight:700;font-size:13.5px;cursor:pointer;margin-top:6px;font-family:'Pretendard',sans-serif;
   }
   .auth-submit:hover{background:#26396B;}
@@ -549,7 +567,7 @@
     background:var(--card);border:1px solid var(--line);color:var(--muted);padding:9px 18px;
     border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;
   }
-  .nav-tab.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .nav-tab.active{background:var(--navy);color:var(--on-navy);border-color:var(--navy);}
 
   /* ---- Exam meta form ---- */
   .field-row{margin-bottom:14px;}
@@ -571,15 +589,15 @@
     border-radius:20px;padding:5px 10px 5px 12px;font-size:12px;cursor:pointer;user-select:none;
   }
   .unit-chip input{margin:0;accent-color:var(--navy);}
-  .unit-chip.checked{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .unit-chip.checked{background:var(--navy);color:var(--on-navy);border-color:var(--navy);}
   .unit-add-row{display:flex;gap:6px;margin-top:4px;}
   .unit-add-row input{flex:1;padding:7px 9px;border:1px solid var(--line);border-radius:3px;font-size:12px;background:var(--card);}
   .unit-add-row button{
-    background:var(--navy);color:#fff;border:none;padding:0 12px;border-radius:3px;font-size:12px;cursor:pointer;font-weight:700;
+    background:var(--navy);color:var(--on-navy);border:none;padding:0 12px;border-radius:3px;font-size:12px;cursor:pointer;font-weight:700;
   }
   .selected-units{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
   .selected-unit-tag{
-    background:var(--navy);color:#fff;font-size:11px;padding:4px 9px;border-radius:12px;
+    background:var(--navy);color:var(--on-navy);font-size:11px;padding:4px 9px;border-radius:12px;
     display:inline-flex;align-items:center;gap:6px;
   }
   .selected-unit-tag .x{cursor:pointer;font-weight:700;opacity:.8;}
@@ -607,7 +625,7 @@
   /* ---- Report: difficulty breakdown table ---- */
   .diff-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px;}
   .diff-table th{
-    background:var(--navy);color:#fff;padding:8px 4px;font-size:11px;font-weight:700;text-align:center;
+    background:var(--navy);color:var(--on-navy);padding:8px 4px;font-size:11px;font-weight:700;text-align:center;
   }
   .diff-table td{padding:9px 4px;text-align:center;border-bottom:1px solid var(--line);font-family:var(--font-mono),monospace;}
   .diff-table td.final-diff{font-weight:700;color:var(--coral);font-family:'Pretendard',sans-serif;}
@@ -2484,7 +2502,7 @@ async function buildPdfBlob(reportNode) {
 function cardShell(theme, kicker, innerHtml, kickerBgCss) {
   const kickerStyle = kickerBgCss ? kickerBgCss : `background:#${theme.navy};`;
   return `<div style="width:1080px;height:1080px;background:#${theme.paper};box-sizing:border-box;padding:64px 70px 50px;display:flex;flex-direction:column;font-family:'Pretendard',sans-serif;color:#${theme.ink};">
-    <div style="${kickerStyle}border-radius:16px;padding:26px 20px;color:#fff;font-weight:700;font-size:27px;text-align:center;margin-bottom:56px;letter-spacing:.01em;">${kicker}</div>
+    <div style="${kickerStyle}border-radius:16px;padding:26px 20px;color:#${theme.onNavy};font-weight:700;font-size:27px;text-align:center;margin-bottom:56px;letter-spacing:.01em;">${kicker}</div>
     <div style="flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0;overflow:hidden;">${innerHtml}</div>
     <div style="text-align:center;color:#${theme.muted};font-size:19px;margin-top:24px;">${'시험분석기 · Exam Analyzer'}</div>
   </div>`;
@@ -2592,7 +2610,9 @@ function getThemeHexColors() {
     line: clean(cs.getPropertyValue('--line')),
     ink: clean(cs.getPropertyValue('--ink')),
     green: clean(cs.getPropertyValue('--green')),
-    paper: clean(cs.getPropertyValue('--paper')) || 'FAF6EF'
+    paper: clean(cs.getPropertyValue('--paper')) || 'FAF6EF',
+    onNavy: clean(cs.getPropertyValue('--on-navy')) || 'FFFFFF',
+    onCoral: clean(cs.getPropertyValue('--on-coral')) || 'FFFFFF'
   };
 }
 
@@ -2620,7 +2640,7 @@ async function buildDocxBlob(a) {
   const cellPara = (text, opts) => new Paragraph({ children: [run(String(text ?? ''), opts)] });
   const headerCell = (text) => new TableCell({
     shading: { fill: theme.navy },
-    children: [new Paragraph({ children: [run(text, { bold: true, color: 'FFFFFF', size: 20 })] })]
+    children: [new Paragraph({ children: [run(text, { bold: true, color: theme.onNavy, size: 20 })] })]
   });
   const labelCell = (text, span) => new TableCell({
     columnSpan: span || 1,
@@ -2847,13 +2867,13 @@ async function buildPptxBlob(a) {
     x: 0.7, y: 0.55, w: 12, h: 0.5, fontFace: FONT, fontSize: 16, color: theme.coral, bold: true, charSpacing: 2
   });
   s.addText(`${info.school||''} ${info.grade||''}`, {
-    x: 0.7, y: 1.25, w: 12, h: 1.5, fontFace: FONT, fontSize: 54, bold: true, color: 'FFFFFF'
+    x: 0.7, y: 1.25, w: 12, h: 1.5, fontFace: FONT, fontSize: 54, bold: true, color: theme.onNavy
   });
   s.addText(`${info.subject||''} 분석`, {
     x: 0.7, y: 2.75, w: 12, h: 2.1, fontFace: FONT, fontSize: 72, bold: true, color: theme.coral, charSpacing: 4
   });
   s.addText(`총 ${info.total_questions||'-'}문항 · ${info.total_points||'-'}점${info.scope ? '  ·  ' + info.scope : ''}`, {
-    x: 0.7, y: 5.15, w: 12, h: 0.6, fontFace: FONT, fontSize: 15, color: 'C7CFE3'
+    x: 0.7, y: 5.15, w: 12, h: 0.6, fontFace: FONT, fontSize: 15, color: theme.onNavy
   });
   s.addShape(pptx.shapes.OVAL, {
     x: 11.7, y: 0.55, w: 0.9, h: 0.9, fill: { type: 'none' }, line: { color: theme.coral, width: 1.5 }
@@ -2890,7 +2910,7 @@ async function buildPptxBlob(a) {
 
   addSectionTag(s, pptx, 'LEVEL', '난이도별 구성', theme, FONT, 1.65);
   const diffHeaderRow = [...DIFF_LEVELS, '최종난이도'].map(h => ({
-    text: h, options: { bold: true, color: 'FFFFFF', fill: { color: theme.navy }, fontFace: FONT, fontSize: 10.5, align: 'center' }
+    text: h, options: { bold: true, color: theme.onNavy, fill: { color: theme.navy }, fontFace: FONT, fontSize: 10.5, align: 'center' }
   }));
   const diffValueRow = [...DIFF_LEVELS.map(l => ({
     text: String(diff[l] ?? 0), options: { fontFace: FONT, fontSize: 13, align: 'center' }
@@ -2965,7 +2985,7 @@ async function buildPptxBlob(a) {
       x: 0.6, y: 0.4, w: 8, h: 0.6, fontFace: FONT, fontSize: 22, bold: true, color: theme.navy
     });
     const headerRow = ['번호','단원','유형','배점','난이도','요약','출처'].map(h => ({
-      text: h, options: { bold: true, color: 'FFFFFF', fill: { color: theme.navy }, fontFace: FONT, fontSize: 10 }
+      text: h, options: { bold: true, color: theme.onNavy, fill: { color: theme.navy }, fontFace: FONT, fontSize: 10 }
     }));
     const rows = [headerRow, ...chunk.map(it => [
       { text: String(it.number??''), options: { fontFace: FONT, fontSize: 10 } },
