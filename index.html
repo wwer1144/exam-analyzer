@@ -235,7 +235,20 @@
     padding:2px 7px;border-radius:2px;font-weight:700;letter-spacing:.04em;
   }
 
-  /* ==== 매거진 테마: 카드형이 아닌 에디토리얼(잡지 지면) 레이아웃 ==== */
+  /* ==== 카드형(기본): 매스너리(핀터레스트식) 2단 카드 배치 — 표는 넓은 폭 유지 ==== */
+  html:not([data-layout]) .sections-wrap{
+    column-count:2; column-gap:20px;
+  }
+  html:not([data-layout]) .sections-wrap > .section{
+    break-inside:avoid; display:inline-block; width:100%; margin-bottom:20px;
+    box-shadow:0 3px 10px rgba(0,0,0,.06);
+  }
+  html:not([data-layout]) .sections-wrap > .section:has(table){
+    column-span:all;
+  }
+  @media (max-width:820px){ html:not([data-layout]) .sections-wrap{column-count:1;} }
+
+  /* ==== 매거진형: 잡지 지면 — 얇은 룰, 세리프 헤드라인, 본문은 신문처럼 2단 컬럼 ==== */
   [data-layout="magazine"] .stamp-header{
     background:none;color:var(--ink);border-bottom:3px solid var(--ink);border-radius:0;
     padding:0 0 20px;margin-bottom:28px;align-items:flex-end;
@@ -285,71 +298,105 @@
   }
   [data-layout="magazine"] .items th{background:var(--ink);}
   [data-layout="magazine"] .items{border-top:2px solid var(--ink);}
+  /* 본문 텍스트 위주 섹션은 신문 지면처럼 2단 컬럼으로 흘려 조판 */
+  [data-layout="magazine"] .section:has(ul):not(:has(table)) ul,
+  [data-layout="magazine"] .trend-box,
+  [data-layout="magazine"] .prep-view .pv-content{
+    column-count:2; column-gap:28px;
+  }
+  [data-layout="magazine"] .key-item-card .ki-reason,
+  [data-layout="magazine"] .strategy-card .strategy-desc{
+    column-count:1;
+  }
 
-  /* ==== 인포그래픽형: 둥근 배지, 컬러풀한 원형 강조, 여백 넉넉 ==== */
+  /* ==== 인포그래픽형: 타일 그리드 + 원형/컬러 강조, 숫자는 최대한 크게 ==== */
+  [data-layout="infographic"] .sections-wrap{
+    display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start;
+  }
+  [data-layout="infographic"] .sections-wrap > .section:has(table){grid-column:1/-1;}
   [data-layout="infographic"] .stamp-header{border-radius:24px;}
   [data-layout="infographic"] .stat-row{gap:20px;}
   [data-layout="infographic"] .stat-card{
     border-radius:50%;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     border:3px solid var(--navy);background:var(--card);padding:10px;
   }
-  [data-layout="infographic"] .stat-card .num{font-size:30px;}
+  [data-layout="infographic"] .stat-card .num{font-size:34px;}
   [data-layout="infographic"] .stat-card .lbl{font-size:10px;}
-  [data-layout="infographic"] .section{border-radius:20px;border-width:2px;}
-  [data-layout="infographic"] .section h3 .tag{border-radius:50px;padding:4px 12px;}
-  [data-layout="infographic"] .diff-table th{border-radius:0;}
-  [data-layout="infographic"] .diff-table{border-radius:14px;overflow:hidden;}
-  [data-layout="infographic"] .pill{border-radius:50px;padding:6px 14px;font-weight:700;}
+  [data-layout="infographic"] .section{border-radius:20px;border-width:2px;height:100%;}
+  [data-layout="infographic"] .section h3{font-size:16px;}
+  [data-layout="infographic"] .section h3 .tag{border-radius:50px;padding:5px 14px;font-size:11px;}
+  [data-layout="infographic"] .diff-table{border-radius:14px;overflow:hidden;font-size:16px;}
+  [data-layout="infographic"] .diff-table td{font-size:20px;font-weight:700;padding:12px 4px;}
+  [data-layout="infographic"] .pill{border-radius:50px;padding:8px 16px;font-weight:700;font-size:13px;}
   [data-layout="infographic"] .bar-track, [data-layout="infographic"] .bar-fill{border-radius:50px;}
+  [data-layout="infographic"] .bar-track{height:14px;}
   [data-layout="infographic"] .key-item-card, [data-layout="infographic"] .strategy-card, [data-layout="infographic"] .match-case-card{border-radius:20px;}
+  [data-layout="infographic"] .donut-center-num{font-size:38px;}
+  @media (max-width:820px){ [data-layout="infographic"] .sections-wrap{grid-template-columns:1fr;} }
 
-  /* ==== 타임라인형: 세로 선 + 원형 마커로 섹션을 잇는 구조 ==== */
-  [data-layout="timeline"] .layout, [data-layout="timeline"] .wizard-inner.wide{position:relative;}
+  /* ==== 타임라인형: 옆으로 스크롤되는 카드 흐름 (진짜 가로 타임라인) ==== */
+  [data-layout="timeline"] .sections-wrap{
+    display:flex; flex-direction:row; gap:22px; overflow-x:auto; padding:10px 4px 22px;
+    position:relative;
+  }
+  [data-layout="timeline"] .sections-wrap::before{
+    content:''; position:absolute; left:0; right:0; top:38px; height:3px; background:var(--line); z-index:0;
+  }
   [data-layout="timeline"] .section{
-    position:relative;padding-left:32px;border:none;background:none;box-shadow:none;
-    border-left:3px solid var(--line);margin-bottom:30px;padding-bottom:6px;
+    position:relative; flex:0 0 380px; border:none; background:var(--card);
+    box-shadow:0 4px 14px rgba(0,0,0,.08); border-radius:12px; padding:22px 20px 18px;
+    margin-bottom:0; z-index:1; overflow-x:auto;
   }
-  [data-layout="timeline"] .section:last-child{border-left-color:transparent;}
+  [data-layout="timeline"] .section:has(table){flex-basis:560px;}
   [data-layout="timeline"] .section::before{
-    content:'';position:absolute;left:-9px;top:2px;width:16px;height:16px;border-radius:50%;
-    background:var(--coral);border:3px solid var(--paper);box-shadow:0 0 0 2px var(--coral);
+    content:''; position:absolute; left:20px; top:-16px; width:14px; height:14px; border-radius:50%;
+    background:var(--coral); border:3px solid var(--paper); box-shadow:0 0 0 2px var(--coral);
   }
-  [data-layout="timeline"] .section h3{margin-left:6px;}
-  [data-layout="timeline"] .stamp-header{border-radius:0 0 0 0;}
-  [data-layout="timeline"] .stat-row{padding-left:32px;border-left:3px solid var(--line);margin-left:0;}
+  [data-layout="timeline"] .stamp-header{border-radius:12px;}
+  [data-layout="timeline"] .stat-row{overflow-x:auto;}
 
-  /* ==== 미니멀형: 테두리/배경 최소화, 타이포와 여백만으로 구성 ==== */
+  /* ==== 미니멀형: 좁은 단일 컬럼, 장식 완전 제거, 타이포와 여백만 ==== */
+  [data-layout="minimal"] .wizard-inner.wide{max-width:640px;}
   [data-layout="minimal"] .stamp-header{background:none;color:var(--ink);border:none;padding:0 0 20px;}
   [data-layout="minimal"] .stamp-header .meta-title{color:var(--ink);}
   [data-layout="minimal"] .stamp-header .meta-sub{color:var(--muted);}
   [data-layout="minimal"] .seal{display:none;}
   [data-layout="minimal"] .stat-row{background:none;border:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;}
   [data-layout="minimal"] .stat-card{background:none;border:none;box-shadow:none;}
-  [data-layout="minimal"] .section{background:none;border:none;box-shadow:none;border-bottom:1px solid var(--line);border-radius:0;padding:0 0 22px;}
+  [data-layout="minimal"] .sections-wrap > .section{background:none;border:none;box-shadow:none;border-bottom:1px solid var(--line);border-radius:0;padding:0 0 26px;margin-bottom:26px;}
   [data-layout="minimal"] .section h3 .tag{background:none;color:var(--muted);padding:0;}
   [data-layout="minimal"] .diff-table th{background:none;color:var(--ink);border-bottom:1px solid var(--ink);}
   [data-layout="minimal"] .pill{background:none;border:1px solid var(--line);border-radius:0;}
   [data-layout="minimal"] .key-item-card, [data-layout="minimal"] .strategy-card, [data-layout="minimal"] .match-case-card{
     background:none;border:none;border-left:2px solid var(--line);border-radius:0;box-shadow:none;
   }
+  [data-layout="minimal"] .strategy-grid, [data-layout="minimal"] .key-item-grid{display:block;}
+  [data-layout="minimal"] .strategy-card, [data-layout="minimal"] .key-item-card{margin-bottom:16px;}
   [data-layout="minimal"] .items th{background:none;color:var(--ink);border-bottom:1px solid var(--ink);}
 
-  /* ==== 대시보드형: 조밀한 그리드, 카드형 위젯, 그림자 강조 ==== */
+  /* ==== 대시보드형: 3열 그리드 위젯 패널 (실제 애널리틱스 대시보드처럼 동시에 보임) ==== */
+  [data-layout="dashboard"] .sections-wrap{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px; align-items:start;
+  }
+  [data-layout="dashboard"] .sections-wrap > .section:has(table){grid-column:1/-1;}
   [data-layout="dashboard"] .stat-row{gap:10px;}
   [data-layout="dashboard"] .stat-card{
     box-shadow:0 2px 8px rgba(0,0,0,.08);border-radius:8px;padding:14px 10px;
   }
   [data-layout="dashboard"] .stat-card .num{font-size:24px;}
   [data-layout="dashboard"] .section{
-    box-shadow:0 2px 10px rgba(0,0,0,.06);border-radius:10px;padding:18px 20px;
+    box-shadow:0 2px 10px rgba(0,0,0,.06);border-radius:10px;padding:16px 18px;font-size:12.5px;height:100%;
   }
+  [data-layout="dashboard"] .section h3{font-size:13px;}
   [data-layout="dashboard"] .key-item-grid, [data-layout="dashboard"] .strategy-grid{
-    display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+    display:grid;grid-template-columns:1fr;gap:10px;
   }
   [data-layout="dashboard"] .key-item-card, [data-layout="dashboard"] .strategy-card{
-    box-shadow:0 2px 6px rgba(0,0,0,.06);border-radius:8px;
+    box-shadow:0 2px 6px rgba(0,0,0,.06);border-radius:8px;padding:12px 14px;
   }
-  [data-layout="dashboard"] .diff-table{box-shadow:0 2px 6px rgba(0,0,0,.06);border-radius:8px;overflow:hidden;}
+  [data-layout="dashboard"] .diff-table{box-shadow:0 2px 6px rgba(0,0,0,.06);border-radius:8px;overflow:hidden;font-size:11.5px;}
+  @media (max-width:900px){ [data-layout="dashboard"] .sections-wrap{grid-template-columns:1fr 1fr;} }
+  @media (max-width:620px){ [data-layout="dashboard"] .sections-wrap{grid-template-columns:1fr;} }
 
   .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
   .bar-row .name{width:120px;flex:none;font-weight:600;}
@@ -994,12 +1041,14 @@ function buildPreviewHtml(a) {
     <div class="stat-card"><div class="num">3</div><div class="lbl">출제 단원 수</div></div>
     <div class="stat-card"><div class="num">${info.total_points}</div><div class="lbl">총 배점</div></div>
   </div>`;
+  html += `<div class="sections-wrap">`;
   html += `<div class="section"><h3><span class="tag">LEVEL</span> 난이도별 구성</h3>
     <table class="diff-table"><thead><tr>${DIFF_LEVELS.map(l=>`<th>${l}</th>`).join('')}<th>최종난이도</th></tr></thead>
     <tbody><tr>${DIFF_LEVELS.map(l=>`<td>${diff[l]}</td>`).join('')}<td class="final-diff">${a.final_difficulty}</td></tr></tbody></table>
   </div>`;
-  html += buildDonutChartHtml(a.unit_distribution).length
-    ? `<div class="section"><h3><span class="tag">CHART</span> 단원별 출제 비중</h3>${buildDonutChartHtml(a.unit_distribution)}</div>` : '';
+  html += `<div class="section"><h3><span class="tag">CHART</span> 단원별 출제 비중</h3>${buildDonutChartHtml(a.unit_distribution)}</div>`;
+  html += `<div class="section"><h3><span class="tag">INSIGHT</span> 출제 경향</h3><ul style="margin:0;padding-left:16px;font-size:12px;"><li>샘플 코멘트 문장입니다.</li><li>두 번째 코멘트 문장입니다.</li></ul></div>`;
+  html += `</div>`;
   return html;
 }
 
@@ -1959,6 +2008,7 @@ function renderReport(a) {
     <div class="stat-card"><div class="num">${(a.unit_distribution||[]).length}</div><div class="lbl">출제 단원 수</div></div>
     <div class="stat-card"><div class="num">${info.total_points ?? '-'}</div><div class="lbl">총 배점</div></div>
   </div>`;
+  html += `<div class="sections-wrap">`;
 
   html += `<div class="section"><h3><span class="tag">LEVEL</span> 난이도별 구성</h3>
     <table class="diff-table"><thead><tr>
@@ -2085,6 +2135,8 @@ function renderReport(a) {
     });
     html += `</div>`;
   }
+
+  html += `</div>`;
 
   html += `<div class="actions" style="flex-wrap:wrap;">
     <a class="btn-outline" id="manuscriptLink" style="text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:150px;">✍️ 블로그 원고 다운로드</a>
